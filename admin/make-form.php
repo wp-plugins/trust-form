@@ -313,6 +313,7 @@ $admin_mail = !isset( $_GET['action'] ) || 'edit' != $_GET['action'] ? '' : get_
 ?>
 <form name="form" method="post" action="">
 <table class="form-table">
+<tr><th scope="row"><?php echo esc_html( __( 'From Name', TRUST_FORM_DOMAIN ) ); ?></th><td><input type="text" name="from_name" size="56" value="<?php echo $admin_mail != '' ? esc_html($admin_mail[0]['from_name']) : '' ; ?>"></td></tr>
 <tr><th scope="row"><?php echo esc_html( __( 'From', TRUST_FORM_DOMAIN ) ); ?></th><td><input type="text" name="from" size="56" value="<?php echo $admin_mail != '' ? esc_html($admin_mail[0]['from']) : '' ; ?>"></td></tr>
 <tr><th scope="row"><?php echo esc_html( __( 'to', TRUST_FORM_DOMAIN ) ); ?></th><td><input type="text" name="to" size="56" value="<?php echo $admin_mail != '' ? esc_html($admin_mail[0]['to']) : esc_html(get_option('admin_email')) ; ?>"></td></tr>
 <tr><th scope="row"><?php echo esc_html( __( 'cc', TRUST_FORM_DOMAIN ) ); ?></th><td><input type="text" name="cc" size="56" value="<?php echo $admin_mail != '' ? esc_html($admin_mail[0]['cc']) : '' ; ?>"></td></tr>
