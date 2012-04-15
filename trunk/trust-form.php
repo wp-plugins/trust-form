@@ -4,7 +4,7 @@ Plugin Name: Trust Form
 Plugin URI: http://trust-form.org/
 Description: Trust Form is a contact form with confirmation screen and mail and data base support.
 Author: horike takahiro
-Version: 1.0.0-alpha
+Version: 1.0.1-alpha
 Author URI: http://trust-form.org/
 
 
@@ -34,7 +34,7 @@ if ( ! defined( 'TRUST_FORM_PLUGIN_URL' ) )
 new Trust_Form();
 
 class Trust_Form {
-	private $version = '1.0';
+	private $version = '1.0.1';
 	private $edit_page;
 	private $entries_page;
 	private $base_dir;
@@ -571,6 +571,7 @@ jQuery(document).ready(function() {
 		});
 		
 		//admin mailの情報
+		param['admin_mail']['from_name'] = jQuery('input[name=from_name]').val();
 		param['admin_mail']['from'] = jQuery('input[name=from]').val();
 		param['admin_mail']['to'] = jQuery('input[name=to]').val();
 		param['admin_mail']['cc'] = jQuery('input[name=cc]').val();
@@ -1568,6 +1569,9 @@ class Trust_Form_Front {
 		$this->attr = get_post_meta($this->id, 'attr');
 		$this->admin_mail = get_post_meta($this->id, 'admin_mail');
 		$this->config = get_post_meta($this->id, 'config');
+		
+		add_filter( 'wp_mail_from', array( &$this, 'wp_mail_from' ) );
+		add_filter( 'wp_mail_from_name', array( &$this, 'wp_mail_from_name' ) );
 	}
 
 	/* ==================================================
@@ -1775,8 +1779,12 @@ EOT;
 		$responce[0][0] = '';
 		$responce[0][]  = $new_responce;
 		unset($responce[0][0]);
+		
+		$responce[0] = apply_filters( 'tr_save_posts', $responce[0] );
+		
 		update_post_meta( $this->id, 'responce', $responce[0] );
-		$this->_send_admin_mail( $new_responce );
+		$this->_send_admin_mail( $this->id, $new_responce );
+
 	}
 
 	/* ==================================================
@@ -1785,8 +1793,10 @@ EOT;
 	 * @return	void
 	 * @since	1.0
 	 */
-	private function _send_admin_mail( $data ){
+	private function _send_admin_mail( $id, $data ){
 		$body = '';
+		$body .= site_url( '/wp-admin/admin.php?page=trust-form-entries&form='.$id.'&status=new' );
+		$body .= "\n\n";
 		foreach ( $data['data'] as $key => $res ) {
 			if ( $key == 'date' ) {
 				$body .= __( 'Date', TRUST_FORM_DOMAIN ).': '.$res."\n\n";
@@ -1794,9 +1804,16 @@ EOT;
 				$body .= $data['title'][$key].': '.$res."\n\n";
 			}
 		}
-		wp_mail( $this->admin_mail[0]['to'], $this->admin_mail[0]['subject'], $body, "From: {$this->admin_mail[0]['from']}" );
+		wp_mail( $this->admin_mail[0]['to'], $this->admin_mail[0]['subject'], $body );
 	}
 
+	public function wp_mail_from( $mail_from ) {
+		return $this->admin_mail[0]['from'];
+	}
+
+	public function wp_mail_from_name( $mail_from_name ) {
+		return wp_specialchars_decode($this->admin_mail[0]['from_name'], ENT_QUOTES);;
+	}
 
 	/* ==================================================
 	 * do validation

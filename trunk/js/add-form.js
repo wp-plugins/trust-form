@@ -233,7 +233,6 @@ var addTrustForm,TR_element_count = 0;
 			
 			//trエレメントを編集モードにする
 			a('#setting-form').find('tr').bind('click', function(){
-console.log('aaaa');
 				a("#setting-form > tbody > tr").removeClass("element-hover-edit").children(".edit-element-container").css("display", "none");
 				a(this).addClass("element-hover-edit");
 				a(this).children(".setting-element-editor").css("display", "block");
@@ -380,7 +379,7 @@ console.log('aaaa');
 				opacity : 0.7,
 				cancel: "#first-setting-info",
 				helper : function() {
-					return a('<div>');
+					return a('<tr><td></td><td></td></tr>');
 				},
 				sort : function() {
 					a(".sort-hover").html(a('<td colspan="2" class="sort-hover"></td>'));
