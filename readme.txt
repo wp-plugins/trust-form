@@ -3,7 +3,7 @@ Contributors: Horike Takahiro
 Tags:  form, contact form, contact
 Requires at least: 3.3
 Tested up to: 3.3
-Stable tag: 1.0.1-alpha
+Stable tag: 1.0.1
 
 Trust Form is a contact form with confirmation screen and mail and data base support.
 
@@ -29,7 +29,7 @@ Please contact to me.
 = Contributors =
 * [Horike Takahiro](http://twitter.com/horike37)
 * [Seguchi Rie](http://5dg.biz) making the admin screen icon
-* [webnist] Happiness Bug fixes
+* [webnist] Bug fixes
 
 == Installation ==
 
@@ -50,4 +50,8 @@ Please contact to me.
 * alpha version first release. 
 = 1.0.1-alpha =
 * Bug fixes and admin mail add [from name]. 
+= 1.0.1 =
+* Add Auto reply mail
+* Add CSV Download
+* Add HTML templete
 

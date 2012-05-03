@@ -7,6 +7,7 @@ var addTrustForm,TR_element_count = 0;
 			var l,z,v,x="",s,m;
 			
 			postboxes.add_postbox_toggles("trustform");
+			a('.if-js-closed').removeClass('if-js-closed').addClass('closed');
 
 			a('#tab').tabs({ fx: { duration: 'fast', opacity: 'toggle' } });
 			
@@ -55,6 +56,19 @@ var addTrustForm,TR_element_count = 0;
 				a("#require-mark-content > span").html(a(this).val());
 					addTrustForm.setRequireMark(a);
 			});
+			//自動返信メール部分の開閉
+			if ( a("input[name=user_mail_y]").is(":checked") ) {
+				a("#reply-table").css("display", "block");
+			} else {
+				a("#reply-table").css("display", "none");
+			}
+			a("input[name=user_mail_y]").on('click', function(){
+				if ( a("input[name=user_mail_y]").is(":checked") ) {
+					a("#reply-table").show();
+				} else {
+					a("#reply-table").hide();
+				}
+			});
 
 			addTrustForm.setup(a);
 
@@ -66,6 +80,7 @@ var addTrustForm,TR_element_count = 0;
                 zIndex : 5,
                 containment : "document",
                 stop : function(e, dg){
+                    
               	    a("#setting-form > tbody > tr").removeClass("form-element");
                     a("#setting-form > tbody > tr > .element-title").remove();
                     a("#setting-form > tbody > tr > .setting-element-title").css("visibility", "visible");

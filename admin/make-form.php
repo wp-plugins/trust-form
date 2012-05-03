@@ -209,6 +209,35 @@ function trustform_standard_form_meta_box() {
 	  </div>
     </td>
   </tr>
+  <!-- e-mail -->
+  <tr class="form-element ui-draggable e-mail-container" title="e-mail">
+  <td class="element-title"><h4><span class="in-widget-title"><?php echo esc_html(  __( 'E-Mail', TRUST_FORM_DOMAIN )); ?></span></h4></td>
+  <th scope="row" class="setting-element-title" style="visibility: hidden;"><div class="subject"><span class="content">title</span><span class="require"></span></div><div class="submessage"><span class="content"></span></div></th>
+  <td class="setting-element-discription" style="visibility: hidden;">
+    <input type="text" value="" style="display:none;" />
+  </td>
+  <td class="setting-element-editor" style="display:none">
+    <div class="edit-element-container" style="display:none">
+      <img class="edit-menu-icon text-edit edit-button" src="images/generic.png">
+      <img class="edit-menu-icon text-delete delete-button" src="images/no.png">
+      <div class="text-edit-content edit-content display-out" >
+        <div class="edit-content-title"><span><strong><?php echo esc_html(  __( 'E-Mail', TRUST_FORM_DOMAIN )); ?></strong></span><img class="del-icon" src="<?php echo TRUST_FORM_PLUGIN_URL.'/images/del.gif'; ?>"></div>
+        <div class="text-edit-content-title"><strong><?php echo esc_html(  __( 'attribute', TRUST_FORM_DOMAIN ) ); ?></strong></div>
+        <hr class="text-edit-conten-spencer" />
+        <ul>
+          <li><?php echo esc_html( __( 'size', TRUST_FORM_DOMAIN ) ); ?><input type="text" size="3" validate="[required]" name="textbox-size" value="" /></li>
+          <li><?php echo esc_html( __( 'maxlength', TRUST_FORM_DOMAIN ) ); ?><input type="text" size="3" name="textbox-maxlength" value="" /></li>
+          <li><?php echo esc_html( __( 'class', TRUST_FORM_DOMAIN ) ); ?><input type="text" name="textbox-class" value="" /></li>
+        </ul>
+        <div class="text-edit-content-title"><strong><?php echo esc_html(  __( 'validation', TRUST_FORM_DOMAIN ) ); ?></strong></div>
+        <hr class="text-edit-conten-spencer" />
+        <ul style="text-align:left;">
+          <li><input type="checkbox" name="e-mail-required" value="1" /><?php echo esc_html( __( 'required', TRUST_FORM_DOMAIN ) ); ?></li>
+	    </ul>
+	  </div>
+	</div>
+  </td>
+  </tr>
 </table>
 <?php
 }
@@ -274,7 +303,7 @@ function trustform_advanced_form_meta_box() {
 </table>
 <!-- Submit Button -->
 <p id="finish-button" class="submit-container">	
-  <input type="button" name="return-to-input" onclick="javascript:history.back();" value="<?php echo esc_html(  __( 'return', TRUST_FORM_DOMAIN ) ); ?>" />
+  <input type="submit" name="return-to-input" value="<?php echo esc_html(  __( 'return', TRUST_FORM_DOMAIN ) ); ?>" />
   <input type="submit" name="send-to-finish" value="<?php echo esc_html(  __( 'send', TRUST_FORM_DOMAIN ) ); ?>" />
 </p>
 <div class="submit-element-container" style="display:none;">
@@ -304,9 +333,10 @@ function trustform_advanced_form_meta_box() {
 </div>
 </div>
 <?php
-add_meta_box( 'admin-mail', __( 'Admin Mail', TRUST_FORM_DOMAIN ), 'trustform_admin_mail_meta_box', 'trustform', 'normal', 'core' );
 
+add_meta_box( 'admin-mail', __( 'Admin Mail', TRUST_FORM_DOMAIN ), 'trustform_admin_mail_meta_box', 'trustform', 'normal', 'core' );
 do_meta_boxes( 'trustform', 'normal', &$this );
+
 function trustform_admin_mail_meta_box() {
 $form_id = !isset( $_GET['form'] ) || !is_numeric($_GET['form']) ? '' : $_GET['form'] ;
 $admin_mail = !isset( $_GET['action'] ) || 'edit' != $_GET['action'] ? '' : get_post_meta( $form_id, 'admin_mail' ) ;
@@ -320,8 +350,27 @@ $admin_mail = !isset( $_GET['action'] ) || 'edit' != $_GET['action'] ? '' : get_
 <tr><th scope="row"><?php echo esc_html( __( 'bcc', TRUST_FORM_DOMAIN ) ); ?></th><td><input type="text" name="bcc" size="56" value="<?php echo $admin_mail != '' ? esc_html($admin_mail[0]['bcc']) : '' ; ?>"></td></tr>
 <tr><th scope="row"><?php echo esc_html( __( 'Subject', TRUST_FORM_DOMAIN ) ); ?></th><td><input type="text" name="subject" size="56" value="<?php echo $admin_mail != '' ? esc_html($admin_mail[0]['subject']) : '' ; ?>"></td></tr>
 </table>
+</form>
 <?php
 }
+add_meta_box( 'auto-reply-mail', __( 'Auto-reply Mail', TRUST_FORM_DOMAIN ), 'trustform_auto_reply_mail_meta_box', 'trustform', 'default', 'core' );
+do_meta_boxes( 'trustform', 'default', &$this );
+function trustform_auto_reply_mail_meta_box() {
+$form_id = !isset( $_GET['form'] ) || !is_numeric($_GET['form']) ? '' : $_GET['form'] ;
+$user_mail = !isset( $_GET['action'] ) || 'edit' != $_GET['action'] ? '' : get_post_meta( $form_id, 'user_mail' ) ;
+?>
+<p><input type="checkbox" name="user_mail_y" value="1" <?php if(isset($user_mail[0]['user_mail_y'])){checked($user_mail[0]['user_mail_y'], '1');} ?> /><?php _e("use auto reply mail", TRUST_FORM_DOMAIN); ?></p>
+<form name="form2" method="post" action="">
+<table id="reply-table" class="form-table">
+<tr><th scope="row"><?php echo esc_html( __( 'From Name', TRUST_FORM_DOMAIN ) ); ?></th><td><input type="text" name="from_name2" size="56" value="<?php echo $user_mail != '' ? esc_html($user_mail[0]['from_name2']) : '' ; ?>"></td></tr>
+<tr><th scope="row"><?php echo esc_html( __( 'From', TRUST_FORM_DOMAIN ) ); ?></th><td><input type="text" name="from2" size="56" value="<?php echo $user_mail != '' ? esc_html($user_mail[0]['from2']) : '' ; ?>"></td></tr>
+<tr><th scope="row"><?php echo esc_html( __( 'Subject', TRUST_FORM_DOMAIN ) ); ?></th><td><input type="text" name="subject2" size="56" value="<?php echo $user_mail != '' ? esc_html($user_mail[0]['subject2']) : '' ; ?>"></td></tr>
+<tr><th scope="row"><?php echo esc_html( __( 'Message', TRUST_FORM_DOMAIN ) ); ?><br /><span><?php _e("[FORM DATA] contain a form data", TRUST_FORM_DOMAIN); ?></span></th><td><textarea name="message2" rows="13" cols="58" ><?php echo $user_mail != '' ? esc_html($user_mail[0]['message2']) : __("Thank you for your contact!\nWe will send an email to you from the person in charge.\n\n[FORM DATA]\n\n-----\nSignature", TRUST_FORM_DOMAIN) ; ?></textarea></td></tr>
+</table>
+</form>
+<?php
+}
+
 ?>
 <p id="trust-form-short-code-under" <?php echo $display ?>><?php echo esc_html(  __( 'Please insert Copy and paste the tag on the right into page or post', TRUST_FORM_DOMAIN ) ); ?><input type="text" size="60" value="<?php echo '[trust-form id='.$this->form_id.']'; ?>" readonly="readonly" onclick="javascript:jQuery(this).select();" /></p>
 <input type="hidden" name="action" value="save" />
