@@ -4,7 +4,7 @@ Plugin Name: Trust Form
 Plugin URI: http://trust-form.org/
 Description: Trust Form is a contact form with confirmation screen and mail and data base support.
 Author: horike takahiro
-Version: 1.0.1
+Version: 1.0.2
 Author URI: http://trust-form.org/
 
 
@@ -37,7 +37,7 @@ if ( ! defined( 'TRUST_FORM_PLUGIN_DIR' ) )
 new Trust_Form();
 
 class Trust_Form {
-	private $version = '1.0.1';
+	private $version = '1.0.2';
 	private $edit_page;
 	private $entries_page;
 	private $base_dir;
