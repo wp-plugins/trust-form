@@ -4,7 +4,7 @@ Plugin Name: Trust Form
 Plugin URI: http://trust-form.org/
 Description: Trust Form is a contact form with confirmation screen and mail and data base support.
 Author: horike takahiro
-Version: 1.0.1-alpha
+Version: 1.0.1
 Author URI: http://trust-form.org/
 
 
