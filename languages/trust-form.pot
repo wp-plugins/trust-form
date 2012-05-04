@@ -132,6 +132,10 @@ msgstr ""
 msgid "Please enter by using English or number or code"
 msgstr ""
 
+msgid "The format of the e-mail address is invalid"
+msgstr ""
+
+
 ########## trust-forms/admin/entry.php ###########
 #: line 3
 msgid "Entry"
@@ -386,13 +390,30 @@ msgstr ""
 msgid "require image"
 msgstr ""
 
+#: line 214
+msgid "E-Mail"
+msgstr ""
+
+msgid "Auto-reply Mail"
+msgstr ""
+
+msgid "use auto reply mail"
+msgstr ""
+
+msgid "Message"
+msgstr ""
+
+msgid "[FORM DATA] contain a form data"
+msgstr ""
+
+msgid "Thank you for your contact!\nWe will send an email to you from the person in charge.\n\n[FORM DATA]\n\n-----\nSignature"
+msgstr ""
+
 ########## trust-forms/admin/entries-list.php ###########
 
 #: line 10
 msgid "Please select Form"
 msgstr ""
-
-########## trust-forms/admin/entries-list.php ###########
 
 #: line 19
 msgid "Item moved to the New."
@@ -402,3 +423,14 @@ msgstr ""
 msgid "Item moved to the Read."
 msgstr ""
 
+msgid "CSV Download"
+msgstr ""
+
+msgid "Status"
+msgstr ""
+
+msgid "Akismet Configuration"
+msgstr ""
+
+msgid "Don't configuration"
+msgstr ""

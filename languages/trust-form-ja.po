@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Trust Forms\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-09-19 22:01+0900\n"
-"PO-Revision-Date: 2012-01-03 10:45+0900\n"
+"PO-Revision-Date: 2012-05-04 02:13+0900\n"
 "Last-Translator: horike37 <horike37@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -131,6 +131,9 @@ msgstr "半角英数字で入力して下さい"
 #: line 2109
 msgid "Please enter by using English or number or code"
 msgstr "半角英数または記号で入力して下さい"
+
+msgid "The format of the e-mail address is invalid"
+msgstr "メールアドレスの形式が不正です"
 
 ########## trust-forms/admin/entry.php ###########
 #: line 3
@@ -386,12 +389,44 @@ msgstr "必須マーク用テキスト"
 msgid "require image"
 msgstr "必須マーク用画像"
 
+#: line 214
+msgid "E-Mail"
+msgstr "メールアドレス"
+
+msgid "Auto-reply Mail"
+msgstr "自動返信メール"
+
+msgid "use auto reply mail"
+msgstr "自動返信メールを使用する"
+
+msgid "Message"
+msgstr "本文"
+
+msgid "[FORM DATA] contain a form data"
+msgstr "[FORM DATA]はフォームデータを含んでいます"
+
+msgid ""
+"Thank you for your contact!\n"
+"We will send an email to you from the person in charge.\n"
+"\n"
+"[FORM DATA]\n"
+"\n"
+"-----\n"
+"Signature"
+msgstr ""
+"お問い合わせありがとうございます。\n"
+"追って担当者からご連絡差し上げます。\n"
+"\n"
+"[FORM DATA]\n"
+"\n"
+"-----\n"
+"署名"
+
 ########## trust-forms/admin/entries-list.php ###########
 #: line 10
 msgid "Please select Form"
 msgstr "フォームを選択して下さい"
 
-########## trust-forms/admin/entries-list.php ###########
 #: line 19
 msgid "Item moved to the New."
 msgstr "項目のステータスを新規に変更しました"
@@ -400,3 +435,14 @@ msgstr "項目のステータスを新規に変更しました"
 msgid "Item moved to the Read."
 msgstr "項目のステータスを既読に変更しました"
 
+msgid "CSV Download"
+msgstr "CSVダウンロード"
+
+msgid "Status"
+msgstr "ステータス"
+
+msgid "Akismet Configuration"
+msgstr "アキスメット設定"
+
+msgid "Don't configuration"
+msgstr "設定しない"
