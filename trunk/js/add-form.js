@@ -80,8 +80,7 @@ var addTrustForm,TR_element_count = 0;
                 zIndex : 5,
                 containment : "document",
                 stop : function(e, dg){
-                    
-              	    a("#setting-form > tbody > tr").removeClass("form-element");
+                    a("#setting-form > tbody > tr").removeClass("form-element");
                     a("#setting-form > tbody > tr > .element-title").remove();
                     a("#setting-form > tbody > tr > .setting-element-title").css("visibility", "visible");
                     a("#setting-form > tbody > tr > .setting-element-discription").css("visibility", "visible");

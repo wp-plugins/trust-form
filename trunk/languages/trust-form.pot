@@ -428,3 +428,9 @@ msgstr ""
 
 msgid "Status"
 msgstr ""
+
+msgid "Akismet Configuration"
+msgstr ""
+
+msgid "Don't configuration"
+msgstr ""
