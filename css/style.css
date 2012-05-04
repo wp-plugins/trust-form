@@ -43,6 +43,15 @@ input.trust-form-title {
 	border-style:dotted;
 }
 
+#tr-notice {
+    display: none;
+    left: 0;
+    position: absolute;
+    top: 100px;
+    width: 100%;
+    z-index: 100;
+}
+
 ul.toolbar {
     background-color: #222222;
     background-image: -moz-linear-gradient(center top , rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0) 100%);

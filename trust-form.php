@@ -4,7 +4,7 @@ Plugin Name: Trust Form
 Plugin URI: http://trust-form.org/
 Description: Trust Form is a contact form with confirmation screen and mail and data base support.
 Author: horike takahiro
-Version: 1.0.2
+Version: 1.2
 Author URI: http://trust-form.org/
 
 
@@ -563,7 +563,8 @@ jQuery(document).ready(function() {
 				      maxlength:{},
 				      cols:{},
 				      rows:{},
-				      class:{}},
+				      class:{},
+				      akismet:{}},
 				admin_mail:{},
 				user_mail:{},
 				form_admin:{},
@@ -638,26 +639,31 @@ jQuery(document).ready(function() {
 					param['attr']['value'][name][i] = jQuery(this).text();
 				});
 				param['attr']['class'][name] = jQuery(this).find('select').attr('class') ? jQuery(this).find('select').attr('class') : '' ;
+
 			} else if ( jQuery(this).attr('title') == 'radio' || jQuery(this).attr('title') == 'checkbox' ) {
 				param['attr']['value'][name] = [];
 				jQuery(this).find('.setting-element-discription > ul > li').each(function(i){
 					param['attr']['value'][name][i] = jQuery(this).children('input').val();
 				});
 				param['attr']['class'][name] = jQuery(this).find('.setting-element-discription > ul > li:first > input').attr('class') ? jQuery(this).find('.setting-element-discription > ul > li:first > input').attr('class') : '' ;
+
 			} else if ( jQuery(this).attr('title') == 'text' ) {
 				param['attr']['size'][name] = jQuery(this).find('.setting-element-discription > input').attr('size') ? jQuery(this).find('.setting-element-discription > input').attr('size') : '';
 				param['attr']['maxlength'][name] = jQuery(this).find('.setting-element-discription > input').attr('maxlength') ? jQuery(this).find('.setting-element-discription > input').attr('maxlength') : '';
 				param['attr']['class'][name] = jQuery(this).find('.setting-element-discription > input').attr('class') ? jQuery(this).find('.setting-element-discription > input').attr('class') : '' ;
+
 			} else if ( jQuery(this).attr('title') == 'textarea' ) {
 				param['attr']['cols'][name] = jQuery(this).find('.setting-element-discription > textarea').attr('cols') ? jQuery(this).find('.setting-element-discription > textarea').attr('cols') : '';
 				param['attr']['rows'][name] = jQuery(this).find('.setting-element-discription > textarea').attr('rows') ? jQuery(this).find('.setting-element-discription > textarea').attr('rows') : '';
 				param['attr']['class'][name] = jQuery(this).find('.setting-element-discription > textarea').attr('class') ? jQuery(this).find('.setting-element-discription > textarea').attr('class') : '' ;
+
 			} else if ( jQuery(this).attr('title') == 'e-mail' ) {
 				param['attr']['size'][name] = jQuery(this).find('.setting-element-discription > input').attr('size') ? jQuery(this).find('.setting-element-discription > input').attr('size') : '';
 				param['attr']['maxlength'][name] = jQuery(this).find('.setting-element-discription > input').attr('maxlength') ? jQuery(this).find-('.setting-element-discription > input').attr('maxlength') : '';
 				param['attr']['class'][name] = jQuery(this).find('.setting-element-discription > input').attr('class') ? jQuery(this).find('.setting-element-discription > input').attr('class') : '' ;
-			}
 
+			}
+			param['attr']['akismet'][name] = jQuery(this).find('.edit-element-container input[name=akismet-config]:checked').val();
 			param['form_front']['element'][name] = jQuery(this).children('td.setting-element-discription').html();
 		});
 		
@@ -1640,21 +1646,27 @@ function trust_form_shortcode($atts) {
 	
 	if (file_exists(get_stylesheet_directory(). '/trust-form-tpl-'.$id.'.php')) {
 		require_once(get_stylesheet_directory(). '/trust-form-tpl-'.$id.'.php');
+
 	} else {
 		require_once(TRUST_FORM_PLUGIN_DIR. '/trust-form-tpl-.php');
+
 	}
 
 	if ( ( isset( $_POST['send-to-confirm'] ) || ( isset($_POST['mode']) && $_POST['mode'] == 'confirm' ) ) && $trust_form->validate() ) {
 		if ( empty($_POST) || !wp_verify_nonce($_POST['trust_form_input_nonce_field'],'trust_form') )
 			return trust_form_show_input();
 		return trust_form_show_confirm();
-	} elseif ( ( isset( $_POST['send-to-finish'] ) || ( isset($_POST['mode']) && $_POST['mode'] == 'finish' ) ) && $trust_form->validate() ) {
+
+	} elseif ( ( isset( $_POST['send-to-finish'] ) || ( isset($_POST['mode']) && $_POST['mode'] == 'finish' ) ) && !$trust_form->is_spam() && $trust_form->validate() ) {
 		if ( empty($_POST) || !wp_verify_nonce($_POST['trust_form_confirm_nonce_field'],'trust_form') )
 			return trust_form_show_input();
+
 		$trust_form->save();
 		return trust_form_show_finish();
+
 	} else {
 		return trust_form_show_input();
+
 	}
 }
 
@@ -1709,6 +1721,75 @@ class Trust_Form_Front {
 	}
 	public function get_form( $data ) {	
 		return $this->form[0][$data];
+	}
+
+	public function is_spam() {
+		global $akismet_api_host, $akismet_api_port;
+
+		if ( ! function_exists( 'akismet_get_key' ) || ! akismet_get_key() )
+			return false;
+
+		$author = $author_email = $author_url = $content = '';
+		if ( is_array($this->attr[0]['akismet']) ) {
+			foreach( $this->attr[0]['akismet'] as $key => $akismet ) {
+				switch( $akismet ) {
+					case 'author':
+						$author = $_POST[$key];
+						break;
+					case 'author_email':
+						$author_email = $_POST[$key];
+						break;
+					case 'author_url':
+						$author_url = $_POST[$key];
+						break;
+				}
+				$content .= $_POST[$key]."\n\n";
+			}
+		}
+		if ( $author != '' || $author_email != '' || $author_url != '' ) {
+			$akismet = array();
+			$akismet['blog'] = get_option( 'home' );
+			$akismet['blog_lang'] = get_locale();
+			$akismet['blog_charset'] = get_option( 'blog_charset' );
+			$akismet['user_ip'] = preg_replace( '/[^0-9., ]/', '', $_SERVER['REMOTE_ADDR'] );
+			$akismet['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
+			$akismet['referrer'] = $_SERVER['HTTP_REFERER'];
+			$akismet['comment_type'] = 'trust-form';
+
+			if ( $permalink = get_permalink() )
+				$akismet['permalink'] = $permalink;
+
+			if ( '' != $author )
+				$akismet['comment_author'] = $author;
+
+			if ( '' != $author_email )
+				$akismet['comment_author_email'] = $author_email;
+
+			if ( '' != $author_url )
+				$akismet['comment_author_url'] = $author_url;
+
+			if ( '' != $content )
+				$akismet['comment_content'] = $content;
+
+			$ignore = array( 'HTTP_COOKIE', 'HTTP_COOKIE2', 'PHP_AUTH_PW' );
+
+			foreach ( $_SERVER as $key => $value ) {
+				if ( ! in_array( $key, (array) $ignore ) )
+				$akismet["$key"] = $value;
+			}
+
+			$query_string = '';
+
+			foreach ( $akismet as $key => $data )
+				$query_string .= $key . '=' . urlencode( stripslashes( (string) $data ) ) . '&';
+
+			$response = akismet_http_post( $query_string,
+				$akismet_api_host, '/1.1/comment-check', $akismet_api_port );
+
+			$response = apply_filters( 'tr_akismet_responce', $response );
+
+			return $response[1] == 'true' ? true : false;
+		}
 	}
 	/* ==================================================
 	 * Show input screen for display
@@ -1956,6 +2037,10 @@ EOT;
 			}
 		}
 		$body = str_replace( '[FORM DATA]', $body, $this->user_mail[0]['message2'] );
+
+		foreach ( $data['data'] as $key => $res ) {
+			$body = str_replace( '['.$key.']', $res, $body );
+		}
 		
 		$body = apply_filters( 'tr_pre_auto_reply_mail_body', $body, $data['data'] );
 		

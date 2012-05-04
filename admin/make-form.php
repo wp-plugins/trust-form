@@ -5,6 +5,9 @@ $form_config = !isset( $_GET['action'] ) || 'edit' != $_GET['action'] ? '' : get
 ?>
 <style id="front-css" type="text/css">
 </style>
+<div id="tr-notice" style="display: none; opacity: 0;">
+<p><?php _e( 'saved' ); ?></p>
+</div>
 <div id="trust-form-short-code" class="updated" <?php echo $display ?>><p><?php echo esc_html(  __( 'Please insert Copy and paste the tag on the right into page or post', TRUST_FORM_DOMAIN ) ); ?><input type="text" size="60" value="<?php echo '[trust-form id='.$this->form_id.']'; ?>" readonly="readonly" onclick="javascript:jQuery(this).select();" /></p></div>
 <div id="short-code-box">
 <p id="trust-form-title-msg"><?php echo esc_html(  __( 'Form Title', TRUST_FORM_DOMAIN ) ); ?>: <input id="trust-form-title" type="text" size="40" class="trust-form-title" name="trust-form-title" title="form-title" value="<?php echo $this->form_title != '' ? esc_html( $this->form_title ) : 'trust-form' ; ?>" /></p>
@@ -72,6 +75,14 @@ function trustform_standard_form_meta_box() {
             </ul>
           </li>
 	    </ul>
+	    <div class="text-edit-content-title"><strong><?php echo esc_html(  __( 'Akismet Configuration', TRUST_FORM_DOMAIN ) ); ?></strong></div>
+		  <hr class="text-edit-conten-spencer">
+	  	  <ul style="text-align:left;">
+		    <li><input type="radio" name="akismet-config" value="no-config" /><?php echo esc_html( __( "Don't configuration", TRUST_FORM_DOMAIN ) ); ?></li>
+            <li><input type="radio" name="akismet-config" value="author" /><?php echo esc_html( __( 'author', TRUST_FORM_DOMAIN ) ); ?></li>
+		    <li><input type="radio" name="akismet-config" value="author_email" /><?php echo esc_html( __( 'author_email', TRUST_FORM_DOMAIN ) ); ?></li>
+		    <li><input type="radio" name="akismet-config" value="author_url" /><?php echo esc_html( __( 'author_url', TRUST_FORM_DOMAIN ) ); ?></li>
+	      </ul>
 	  </div>
 	</div>
   </td>
@@ -108,6 +119,14 @@ function trustform_standard_form_meta_box() {
             </ul>
           </li>
 	    </ul>
+		<div class="text-edit-content-title"><strong><?php echo esc_html(  __( 'Akismet Configuration', TRUST_FORM_DOMAIN ) ); ?></strong></div>
+		<hr class="text-edit-conten-spencer">
+	  	<ul style="text-align:left;">
+		  <li><input type="radio" name="akismet-config" value="no-config" /><?php echo esc_html( __( "Don't configuration", TRUST_FORM_DOMAIN ) ); ?></li>
+          <li><input type="radio" name="akismet-config" value="author" /><?php echo esc_html( __( 'author', TRUST_FORM_DOMAIN ) ); ?></li>
+		  <li><input type="radio" name="akismet-config" value="author_email" /><?php echo esc_html( __( 'author_email', TRUST_FORM_DOMAIN ) ); ?></li>
+		  <li><input type="radio" name="akismet-config" value="author_url" /><?php echo esc_html( __( 'author_url', TRUST_FORM_DOMAIN ) ); ?></li>
+	    </ul>
 	  </div>
     </div>
   </td>
@@ -140,6 +159,14 @@ function trustform_standard_form_meta_box() {
           <ul>
             <li><?php echo esc_html( __( 'class', TRUST_FORM_DOMAIN ) ); ?><input type="text" name="checkbox-class" value="" /></li>
           </ul>
+		  <div class="text-edit-content-title"><strong><?php echo esc_html(  __( 'Akismet Configuration', TRUST_FORM_DOMAIN ) ); ?></strong></div>
+		  <hr class="text-edit-conten-spencer">
+	  	  <ul style="text-align:left;">
+		    <li><input type="radio" name="akismet-config" value="no-config" /><?php echo esc_html( __( "Don't configuration", TRUST_FORM_DOMAIN ) ); ?></li>
+            <li><input type="radio" name="akismet-config" value="author" /><?php echo esc_html( __( 'author', TRUST_FORM_DOMAIN ) ); ?></li>
+		    <li><input type="radio" name="akismet-config" value="author_email" /><?php echo esc_html( __( 'author_email', TRUST_FORM_DOMAIN ) ); ?></li>
+		    <li><input type="radio" name="akismet-config" value="author_url" /><?php echo esc_html( __( 'author_url', TRUST_FORM_DOMAIN ) ); ?></li>
+	      </ul>
 	    </div>
       </div>
     </td>
@@ -172,6 +199,14 @@ function trustform_standard_form_meta_box() {
           <ul>
             <li><?php echo esc_html( __( 'class', TRUST_FORM_DOMAIN ) ); ?><input type="text" name="radio-class" value="" /></li>
           </ul>
+		  <div class="text-edit-content-title"><strong><?php echo esc_html(  __( 'Akismet Configuration', TRUST_FORM_DOMAIN ) ); ?></strong></div>
+		  <hr class="text-edit-conten-spencer">
+	  	  <ul style="text-align:left;">
+		    <li><input type="radio" name="akismet-config" value="no-config" /><?php echo esc_html( __( "Don't configuration", TRUST_FORM_DOMAIN ) ); ?></li>
+            <li><input type="radio" name="akismet-config" value="author" /><?php echo esc_html( __( 'author', TRUST_FORM_DOMAIN ) ); ?></li>
+		    <li><input type="radio" name="akismet-config" value="author_email" /><?php echo esc_html( __( 'author_email', TRUST_FORM_DOMAIN ) ); ?></li>
+		    <li><input type="radio" name="akismet-config" value="author_url" /><?php echo esc_html( __( 'author_url', TRUST_FORM_DOMAIN ) ); ?></li>
+	      </ul>
 	    </div>
       </div>
       <br style="clear: both;">
@@ -206,6 +241,14 @@ function trustform_standard_form_meta_box() {
         <ul>
           <li><?php echo esc_html( __( 'class', TRUST_FORM_DOMAIN ) ); ?><input type="text" name="selectbox-class" value="" /></li>
         </ul>
+		<div class="text-edit-content-title"><strong><?php echo esc_html(  __( 'Akismet Configuration', TRUST_FORM_DOMAIN ) ); ?></strong></div>
+		<hr class="text-edit-conten-spencer">
+		<ul style="text-align:left;">
+		  <li><input type="radio" name="akismet-config" value="no-config" /><?php echo esc_html( __( "Don't configuration", TRUST_FORM_DOMAIN ) ); ?></li>
+          <li><input type="radio" name="akismet-config" value="author" /><?php echo esc_html( __( 'author', TRUST_FORM_DOMAIN ) ); ?></li>
+		  <li><input type="radio" name="akismet-config" value="author_email" /><?php echo esc_html( __( 'author_email', TRUST_FORM_DOMAIN ) ); ?></li>
+		  <li><input type="radio" name="akismet-config" value="author_url" /><?php echo esc_html( __( 'author_url', TRUST_FORM_DOMAIN ) ); ?></li>
+	    </ul>
 	  </div>
     </td>
   </tr>
@@ -233,6 +276,14 @@ function trustform_standard_form_meta_box() {
         <hr class="text-edit-conten-spencer" />
         <ul style="text-align:left;">
           <li><input type="checkbox" name="e-mail-required" value="1" /><?php echo esc_html( __( 'required', TRUST_FORM_DOMAIN ) ); ?></li>
+	    </ul>
+		<div class="text-edit-content-title"><strong><?php echo esc_html(  __( 'Akismet Configuration', TRUST_FORM_DOMAIN ) ); ?></strong></div>
+		<hr class="text-edit-conten-spencer">
+		<ul style="text-align:left;">
+		  <li><input type="radio" name="akismet-config" value="no-config" /><?php echo esc_html( __( "Don't configuration", TRUST_FORM_DOMAIN ) ); ?></li>
+          <li><input type="radio" name="akismet-config" value="author" /><?php echo esc_html( __( 'author', TRUST_FORM_DOMAIN ) ); ?></li>
+		  <li><input type="radio" name="akismet-config" value="author_email" /><?php echo esc_html( __( 'author_email', TRUST_FORM_DOMAIN ) ); ?></li>
+		  <li><input type="radio" name="akismet-config" value="author_url" /><?php echo esc_html( __( 'author_url', TRUST_FORM_DOMAIN ) ); ?></li>
 	    </ul>
 	  </div>
 	</div>

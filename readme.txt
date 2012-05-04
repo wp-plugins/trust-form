@@ -3,7 +3,7 @@ Contributors: Horike Takahiro
 Tags:  form, contact form, contact
 Requires at least: 3.3
 Tested up to: 3.3
-Stable tag: 1.0.2
+Stable tag: 1.1
 
 Trust Form is a contact form with confirmation screen and mail and data base support.
 
@@ -54,4 +54,5 @@ Please contact to me.
 * Add Auto reply mail
 * Add CSV Download
 * Add HTML templete
-
+= 1.1 =
+* Add Akismet spam filtering

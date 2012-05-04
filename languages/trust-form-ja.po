@@ -441,3 +441,8 @@ msgstr "CSVダウンロード"
 msgid "Status"
 msgstr "ステータス"
 
+msgid "Akismet Configuration"
+msgstr "アキスメット設定"
+
+msgid "Don't configuration"
+msgstr "設定しない"
