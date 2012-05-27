@@ -4,11 +4,11 @@ Plugin Name: Trust Form
 Plugin URI: http://trust-form.org/
 Description: Trust Form is a contact form with confirmation screen and mail and data base support.
 Author: horike takahiro
-Version: 1.3
+Version: 1.3.1
 Author URI: http://trust-form.org/
 
 
-Copyright 2011 horike takahiro (email : horike37@gmail.com)
+Copyright 2012 horike takahiro (email : horike37@gmail.com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ if ( ! defined( 'TRUST_FORM_PLUGIN_DIR' ) )
 new Trust_Form();
 
 class Trust_Form {
-	private $version = '1.0.2';
+	private $version = '1.3.1';
 	private $edit_page;
 	private $entries_page;
 	private $base_dir;
@@ -183,10 +183,6 @@ class Trust_Form {
 			$status = isset($_REQUEST['type']) ? $_REQUEST['type'] : 'all';
 			$name = get_post_meta( $form, 'name' );
 			$responce = get_post_meta( $form, 'responce' );
-			//echo '<pre>';
-			//var_dump($responce);
-			//echo '</pre>';
-			//exit;
 			$csv_ti = array();
 			$csv = array();
 			$count = 0;
@@ -382,7 +378,7 @@ class Trust_Form {
 	 * @since	1.0
 	 */
 	public function admin_menu() {
-		add_menu_page( __( 'Trust Form', TRUST_FORM_DOMAIN ), __( 'Trust Form', TRUST_FORM_DOMAIN ), 'edit_posts', $this->edit_page, array( &$this,'add_admin_edit_page' ) );
+		add_menu_page( __( 'Trust Form', TRUST_FORM_DOMAIN ), __( 'Trust Form', TRUST_FORM_DOMAIN ), 'edit_posts', $this->edit_page, array( &$this,'add_admin_edit_page' ), TRUST_FORM_PLUGIN_URL . '/images/menu-icon.png' );
 		add_submenu_page( $this->edit_page, __( 'Edit Forms', TRUST_FORM_DOMAIN ), __( 'Edit Forms', TRUST_FORM_DOMAIN ), 'edit_posts', $this->edit_page, array( &$this, 'add_admin_edit_page' ) );
 		add_submenu_page( $this->edit_page, __( 'Add Form', TRUST_FORM_DOMAIN ), __( 'Add Form', TRUST_FORM_DOMAIN ), 'edit_posts', $this->add_page, array( &$this, 'add_admin_add_page' ) );
 		add_submenu_page( $this->edit_page, __( 'Entries', TRUST_FORM_DOMAIN ), __( 'Entries', TRUST_FORM_DOMAIN ), 'edit_posts', $this->entries_page, array( &$this, 'add_admin_entries_page' ) );
