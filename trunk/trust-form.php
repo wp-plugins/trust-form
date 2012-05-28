@@ -1,11 +1,11 @@
 <?php 
 /*
 Plugin Name: Trust Form
-Plugin URI: http://trust-form.org/
+Plugin URI: http://www.kakunin-pl.us/
 Description: Trust Form is a contact form with confirmation screen and mail and data base support.
 Author: horike takahiro
-Version: 1.3.1
-Author URI: http://trust-form.org/
+Version: 1.3.2
+Author URI: http://www.kakunin-pl.us/
 
 
 Copyright 2012 horike takahiro (email : horike37@gmail.com)
@@ -972,6 +972,7 @@ class Trust_Form_Entries_List_Table extends WP_List_Table {
 				$arr['date'] = $res['data']['date'];
 				$this->entries_data[] = $arr;
 			}
+			$this->entries_data = apply_filters( 'tr_entry_manage_posts_custom_column', $this->entries_data, $this->id );
 		}
 	}
 	
@@ -1138,6 +1139,8 @@ class Trust_Form_Entries_List_Table extends WP_List_Table {
 			} 
 		}
 		$columns['date'] = __( 'Entry Date', TRUST_FORM_DOMAIN );
+
+		$columns = apply_filters( 'tr_entry_manage_posts_columns', $columns, $this->id );
 		return $columns;
 	}
 	
@@ -1159,6 +1162,7 @@ class Trust_Form_Entries_List_Table extends WP_List_Table {
 			}
 		}
 		$sortable_columns['date'] = array('date',true);
+		$sortable_columns = apply_filters( 'tr_entry_sortable_columns', $sortable_columns );
 
 		return $sortable_columns;
 	}
@@ -1341,6 +1345,7 @@ class Trust_Form_Edit_List_Table extends WP_List_Table {
                 					'date'      => $form->post_modified
 								);
 		}
+		$this->edit_data = apply_filters( 'tr_form_manage_posts_custom_column', $this->edit_data );
 	}
 	
 	/* ==================================================
@@ -1351,13 +1356,7 @@ class Trust_Form_Edit_List_Table extends WP_List_Table {
 	 * @since	1.0
 	 */
 	function column_default( $item, $column_name ) {
-		switch( $column_name ) {
-			//case 'entries':
-			case 'date':
-				return $item[$column_name];
-			default:
-				return print_r( $item, true );
-		}
+		return $item[$column_name];
 	}
 
 	/* ==================================================
@@ -1436,6 +1435,7 @@ class Trust_Form_Edit_List_Table extends WP_List_Table {
 			'title' => __( 'Title', TRUST_FORM_DOMAIN ),
 			'date'  => __( 'Date', TRUST_FORM_DOMAIN )
 		);
+		$columns = apply_filters( 'tr_form_manage_posts_columns', $columns );
 		return $columns;
 	}
 	
@@ -1451,6 +1451,7 @@ class Trust_Form_Edit_List_Table extends WP_List_Table {
 			//'entries'    => array('entries',true),
 			'date'  => array('date',true)
 		);
+		$sortable_columns = apply_filters( 'tr_form_sortable_columns', $sortable_columns );
 		return $sortable_columns;
 	}
 
