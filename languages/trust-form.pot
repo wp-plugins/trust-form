@@ -434,3 +434,10 @@ msgstr ""
 
 msgid "Don't configuration"
 msgstr ""
+
+msgid "Back to post list"
+msgstr ""
+
+msgid "Change Status"
+msgstr ""
+
