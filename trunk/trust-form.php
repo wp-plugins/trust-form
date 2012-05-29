@@ -4,7 +4,7 @@ Plugin Name: Trust Form
 Plugin URI: http://www.kakunin-pl.us/
 Description: Trust Form is a contact form with confirmation screen and mail and data base support.
 Author: horike takahiro
-Version: 1.3.2
+Version: 1.3.3
 Author URI: http://www.kakunin-pl.us/
 
 
@@ -352,19 +352,24 @@ class Trust_Form {
 			exit();
 		} elseif ( $doaction && 'add' == $doaction ) {
 			check_admin_referer( 'entry_'.$_POST['entry'] );
-            if( !isset($_POST['add_note']) || $_POST['add_note'] == '' ) {
-            	wp_die( __('Error add note') );
-            } else {
-            	$entry    = isset($_REQUEST['entry']) ? $_REQUEST['entry'] : -1;
-            	$responce = get_post_meta( $form, 'responce' );
-            	$current_user = wp_get_current_user();
-            	$responce[0][$entry]['note'][] = array( 'display_name' => $current_user->display_name,
-            											'mail'         => $current_user->user_email,
-            											'date'         => date('Y/m/d h:i:s'),
-            											'note'         => $_REQUEST['add_note']
-            										 );
-            	update_post_meta( $form, 'responce', $responce[0] );
-            }
+			if( !isset($_POST['add_note']) ) {
+				wp_die( __('Error add note') );
+			} else {
+				$entry    = isset($_REQUEST['entry']) ? $_REQUEST['entry'] : -1;
+				$responce = get_post_meta( $form, 'responce' );
+				$current_user = wp_get_current_user();
+				$responce[0][$entry]['note'][] = array( 'display_name' => $current_user->display_name,
+														'mail'         => $current_user->user_email,
+														'date'         => date_i18n('Y/m/d H:i:s'),
+														'note'         => $_POST['add_note'],
+														'status'       => $_POST['entry_status']
+													 );
+				
+				if ( $responce[0][$entry]{'status'} != $_REQUEST['entry_status'] ) {
+					$responce[0][$entry]{'status'} = $_REQUEST['entry_status'];
+				}
+				update_post_meta( $form, 'responce', $responce[0] );
+			}
 		} elseif ( ! empty($_REQUEST['_wp_http_referer']) ) {
 			wp_safe_redirect( remove_query_arg( array('_wp_http_referer', '_wpnonce'), stripslashes($_SERVER['REQUEST_URI']) ) );
 			exit();

@@ -337,6 +337,9 @@ table#standard-form-element-list td ul {
 	border-bottom: 1px #E3E3E3 dotted;
 }
 
+.note-detail p {
+	line-height:1.4;
+}
 /*----------- entries-list ------------------*/
 
 #entry-form {
@@ -347,4 +350,10 @@ tr.read {
 	background-color: #C0C0C0;
 }
 
+#entry-contaier h3.read {
+	background-color: #C0C0C0;
+}
 
+#entry-contaier h3.read span {
+	color: black;
+}
