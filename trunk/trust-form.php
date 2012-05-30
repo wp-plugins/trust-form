@@ -4,7 +4,7 @@ Plugin Name: Trust Form
 Plugin URI: http://www.kakunin-pl.us/
 Description: Trust Form is a contact form with confirmation screen and mail and data base support.
 Author: horike takahiro
-Version: 1.3.5
+Version: 1.3.6
 Author URI: http://www.kakunin-pl.us/
 
 
