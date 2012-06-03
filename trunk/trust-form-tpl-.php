@@ -9,7 +9,7 @@ function trust_form_show_input() {
 	$nonce = wp_nonce_field('trust_form','trust_form_input_nonce_field');
 
 	$html = <<<EOT
-<div id="trust-form" class="contact-form" >
+<div id="trust-form" class="contact-form contact-form-input" >
 <p id="message-container-input">{$trust_form->get_input_top()}</p>
 <form action="#trust-form" method="post" >
 <table>
@@ -50,7 +50,7 @@ function trust_form_show_confirm() {
 	$nonce = wp_nonce_field('trust_form','trust_form_confirm_nonce_field');
 
 	$html = <<<EOT
-<div id="trust-form" class="contact-form" >
+<div id="trust-form" class="contact-form contact-form-confirm" >
 <p id="message-container-confirm">{$trust_form->get_form('confirm_top')}</p>
 <form action="#trust-form" method="post" >
 <table>
@@ -77,7 +77,7 @@ function trust_form_show_finish() {
 	global $trust_form;
 	
 	$html = <<<EOT
-<div id="trust-form" class="contact-form" >
+<div id="trust-form" class="contact-form contact-form-finish" >
 <p id="message-container-confirm">{$trust_form->get_form('finish')}</p>
 </div>
 EOT;

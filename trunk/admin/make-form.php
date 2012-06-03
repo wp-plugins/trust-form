@@ -310,7 +310,7 @@ function trustform_advanced_form_meta_box() {
 <li id="menu-css_editor"><?php echo esc_html( __( 'CSS Editor', TRUST_FORM_DOMAIN ) ); ?></li>
 <li id="menu-require_mark"><?php echo esc_html( __( 'Require Mark', TRUST_FORM_DOMAIN ) ); ?></li>
 </ul>
-<div class="contact-form">
+<div class="contact-form contact-form-input">
 <?php if ( $form_admin !='' ) : ?>
 <?php echo $form_admin[0]['input'] ?>
 <?php  else : ?>
@@ -341,7 +341,7 @@ function trustform_advanced_form_meta_box() {
 </div>
 </div>
 <div id="tab-2">
-<div class="contact-form">
+<div class="contact-form contact-form-confirm">
 <?php if ( $form_admin !='' ) : ?>
 <?php echo $form_admin[0]['confirm'] ?>
 <?php  else : ?>
@@ -372,7 +372,7 @@ function trustform_advanced_form_meta_box() {
 </div>
 </div>
 <div id="tab-3">
-<div class="contact-form">
+<div class="contact-form contact-form-finish">
 <?php if ( $form_admin !='' ) : ?>
 <?php echo $form_admin[0]['finish'] ?>
 <?php  else : ?>
