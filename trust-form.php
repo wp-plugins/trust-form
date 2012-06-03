@@ -4,7 +4,7 @@ Plugin Name: Trust Form
 Plugin URI: http://www.kakunin-pl.us/
 Description: Trust Form is a contact form with confirmation screen and mail and data base support.
 Author: horike takahiro
-Version: 1.3.4
+Version: 1.3.7
 Author URI: http://www.kakunin-pl.us/
 
 
@@ -37,7 +37,7 @@ if ( ! defined( 'TRUST_FORM_PLUGIN_DIR' ) )
 new Trust_Form();
 
 class Trust_Form {
-	private $version = '1.3.1';
+	private $version = '1.3.7';
 	private $edit_page;
 	private $entries_page;
 	private $base_dir;
@@ -1732,7 +1732,7 @@ class Trust_Form_Front {
 			return false;
 
 		$author = $author_email = $author_url = $content = '';
-		if ( is_array($this->attr[0]['akismet']) ) {
+		if ( isset($this->attr[0]['akismet']) && is_array($this->attr[0]['akismet']) ) {
 			foreach( $this->attr[0]['akismet'] as $key => $akismet ) {
 				switch( $akismet ) {
 					case 'author':
@@ -1955,10 +1955,13 @@ EOT;
 	public function get_input_data( $key ) {
 		switch ( $this->type[0][$key] ) {
 			case 'checkbox':
-				$checkbox = '<ul>';
-				if ( is_array($_POST[$key]) ) {
-					foreach( $_POST[$key] as $val ) {
-						$checkbox .= '<li>'.esc_html($val).'<input type="hidden" name="'.esc_html($key).'[]" value="'.esc_html($val).'" /></li>'; 
+				$checkbox = '';
+				if ( isset($_POST[$key]) ) {
+					$checkbox .= '<ul>';
+					if ( is_array($_POST[$key]) ) {
+						foreach( $_POST[$key] as $val ) {
+							$checkbox .= '<li>'.esc_html($val).'<input type="hidden" name="'.esc_html($key).'[]" value="'.esc_html($val).'" /></li>'; 
+						}
 					}
 				}
 				$checkbox .= '</ul>';
@@ -1986,8 +1989,10 @@ EOT;
 			switch ( $this->type[0][$key] ) {
 				case 'checkbox':
 					$checkbox = '';
-					foreach ( $_POST[$key] as $val ) {
-						$checkbox .= $val.',';
+					if ( isset($_POST[$key]) ) {
+						foreach ( $_POST[$key] as $val ) {
+							$checkbox .= $val.',';
+						}
 					}
 					$new_responce['data'][$key] = rtrim($checkbox, ',');
 					break;
@@ -2014,7 +2019,8 @@ EOT;
 				if (  $this->type[0][$key] =='e-mail' )
 					add_filter( 'wp_mail_from', array(&$this, 'wp_user_mail_from'));
 					add_filter( 'wp_mail_from_name',  array(&$this, 'wp_user_mail_from_name') );
-					$this->_send_user_mail( $this->id, $new_responce, $_POST[$key] );
+					if ( isset($_POST[$key]) )
+						$this->_send_user_mail( $this->id, $new_responce, $_POST[$key] );
 			}
 		}
 		add_filter( 'wp_mail_from', array(&$this, 'wp_mail_from'));
@@ -2067,7 +2073,10 @@ EOT;
 				$body .= $data['title'][$key].': '.$res."\n\n";
 			}
 		}
-		wp_mail( $this->admin_mail[0]['to'], $this->admin_mail[0]['subject'], $body );
+		$headers = '';
+		$headers .= $this->admin_mail[0]['cc'] != '' ? 'cc:' . $this->admin_mail[0]['cc'] . "\n" : '' ;
+		$headers .= $this->admin_mail[0]['bcc'] != '' ? 'bcc:' . $this->admin_mail[0]['bcc'] . "\n" : '' ;
+		wp_mail( $this->admin_mail[0]['to'], $this->admin_mail[0]['subject'], $body, $headers );
 	}
 
 	public function wp_mail_from( $mail_from ) {
