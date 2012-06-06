@@ -4,7 +4,7 @@ Plugin Name: Trust Form
 Plugin URI: http://www.kakunin-pl.us/
 Description: Trust Form is a contact form with confirmation screen and mail and data base support.
 Author: horike takahiro
-Version: 1.3.7
+Version: 1.3.8
 Author URI: http://www.kakunin-pl.us/
 
 
@@ -221,8 +221,10 @@ class Trust_Form {
 				}
 			}
 
-			mb_convert_variables('SJIS', 'UTF-8', $csv_ti);
-			mb_convert_variables('SJIS', 'UTF-8', $csv);
+			if ( function_exists('mb_convert_variables') ) {
+				mb_convert_variables('SJIS', 'UTF-8', $csv_ti);
+				mb_convert_variables('SJIS', 'UTF-8', $csv);
+			}
 
 			$file_name = 'result_'.time().'.csv';
 			$full_file_name = $this->plugin_dir . '/csv/' . $file_name;
@@ -386,7 +388,9 @@ class Trust_Form {
 		add_menu_page( __( 'Trust Form', TRUST_FORM_DOMAIN ), __( 'Trust Form', TRUST_FORM_DOMAIN ), 'edit_posts', $this->edit_page, array( &$this,'add_admin_edit_page' ), TRUST_FORM_PLUGIN_URL . '/images/menu-icon.png' );
 		add_submenu_page( $this->edit_page, __( 'Edit Forms', TRUST_FORM_DOMAIN ), __( 'Edit Forms', TRUST_FORM_DOMAIN ), 'edit_posts', $this->edit_page, array( &$this, 'add_admin_edit_page' ) );
 		add_submenu_page( $this->edit_page, __( 'Add Form', TRUST_FORM_DOMAIN ), __( 'Add Form', TRUST_FORM_DOMAIN ), 'edit_posts', $this->add_page, array( &$this, 'add_admin_add_page' ) );
-		add_submenu_page( $this->edit_page, __( 'Entries', TRUST_FORM_DOMAIN ), __( 'Entries', TRUST_FORM_DOMAIN ), 'edit_posts', $this->entries_page, array( &$this, 'add_admin_entries_page' ) );
+
+		if ( !defined( 'TRUST_FORM_DB_SUPPORT' ) || TRUST_FORM_DB_SUPPORT !== false )
+			add_submenu_page( $this->edit_page, __( 'Entries', TRUST_FORM_DOMAIN ), __( 'Entries', TRUST_FORM_DOMAIN ), 'edit_posts', $this->entries_page, array( &$this, 'add_admin_entries_page' ) );
 	}
 
 	/* ==================================================
@@ -2011,21 +2015,35 @@ EOT;
 		unset($responce[0][0]);
 		
 		$responce[0] = apply_filters( 'tr_save_posts', $responce[0] );
-		
-		update_post_meta( $this->id, 'responce', $responce[0] );
+
+		if ( !defined( 'TRUST_FORM_DB_SUPPORT' ) || TRUST_FORM_DB_SUPPORT !== false )
+			update_post_meta( $this->id, 'responce', $responce[0] );
 		
 		if ( $this->user_mail[0]['user_mail_y'] === '1' ) {
 			foreach( $this->name[0] as $key => $name ) {
-				if (  $this->type[0][$key] =='e-mail' )
+				if (  $this->type[0][$key] =='e-mail' ) {
 					add_filter( 'wp_mail_from', array(&$this, 'wp_user_mail_from'));
 					add_filter( 'wp_mail_from_name',  array(&$this, 'wp_user_mail_from_name') );
 					if ( isset($_POST[$key]) )
 						$this->_send_user_mail( $this->id, $new_responce, $_POST[$key] );
+				}
 			}
 		}
+		if ( has_filter( 'wp_mail_from', array(&$this, 'wp_user_mail_from') ) )
+			remove_filter( 'wp_mail_from', array(&$this, 'wp_user_mail_from') );
+
+		if ( has_filter( 'wp_mail_from_name', array(&$this, 'wp_user_mail_from_name') ) )
+			remove_filter( 'wp_mail_from_name', array(&$this, 'wp_user_mail_from_name') );
+
 		add_filter( 'wp_mail_from', array(&$this, 'wp_mail_from'));
 		add_filter( 'wp_mail_from_name',  array(&$this, 'wp_mail_from_name') );
 		$this->_send_admin_mail( $this->id, $new_responce );
+
+		if ( has_filter( 'wp_mail_from', array(&$this, 'wp_mail_from') ) )
+			remove_filter( 'wp_mail_from', array(&$this, 'wp_mail_from') );
+
+		if ( has_filter( 'wp_mail_from_name', array(&$this, 'wp_mail_from_name') ) )
+			remove_filter( 'wp_mail_from_name', array(&$this, 'wp_mail_from_name') );
 	}
 
 	/* ==================================================
@@ -2064,8 +2082,10 @@ EOT;
 	private function _send_admin_mail( $id, $data ){
 		$data['data'] = apply_filters( 'tr_pre_admin_mail', $data['data'] );
 		$body = '';
-		$body .= site_url( '/wp-admin/admin.php?page=trust-form-entries&form='.$id.'&status=new' );
-		$body .= "\n\n";
+		if ( !defined( 'TRUST_FORM_DB_SUPPORT' ) || TRUST_FORM_DB_SUPPORT !== false ) {
+			$body .= site_url( '/wp-admin/admin.php?page=trust-form-entries&form='.$id.'&status=new' );
+			$body .= "\n\n";
+		}
 		foreach ( $data['data'] as $key => $res ) {
 			if ( $key == 'date' ) {
 				$body .= __( 'Date', TRUST_FORM_DOMAIN ).': '.$res."\n\n";

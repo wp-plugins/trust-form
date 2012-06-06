@@ -3,7 +3,7 @@ Contributors: horike
 Tags:  form, contact form, contact
 Requires at least: 3.3
 Tested up to: 3.3
-Stable tag: 1.3.7
+Stable tag: 1.3.8
 
 Trust Form is a contact form with confirmation screen and mail and data base support.
 
@@ -29,7 +29,7 @@ Please contact to me.
 = Contributors =
 * [Horike Takahiro](http://twitter.com/horike37)
 * [Seguchi Rie](http://5dg.biz) making the admin screen icon
-* [webnist] Bug fixes
+* webnist Bug fixes
 
 == Installation ==
 
@@ -56,3 +56,5 @@ Please contact to me.
 * Add HTML templete
 = 1.1 =
 * Add Akismet spam filtering
+= 1.3.8 =
+* When you write define( 'TRUST_FORM_DB_SUPPORT', false ); in wp-config.php, don't store in DB.
