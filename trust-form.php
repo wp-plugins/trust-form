@@ -4,7 +4,7 @@ Plugin Name: Trust Form
 Plugin URI: http://www.kakunin-pl.us/
 Description: Trust Form is a contact form with confirmation screen and mail and data base support.
 Author: horike takahiro
-Version: 1.4.0
+Version: 1.4.1
 Author URI: http://www.kakunin-pl.us/
 
 
@@ -1721,12 +1721,12 @@ function trust_form_shortcode($atts) {
 
 	}
 
-	if ( ( isset( $_POST['send-to-confirm'] ) || ( isset($_POST['mode']) && $_POST['mode'] == 'confirm' ) ) && $trust_form->validate() ) {
+	if ( ( isset( $_POST['send-to-confirm'] ) || isset( $_POST['send-to-confirm_x'] ) || ( isset($_POST['mode']) && $_POST['mode'] == 'confirm' ) ) && $trust_form->validate() ) {
 		if ( empty($_POST) || !wp_verify_nonce($_POST['trust_form_input_nonce_field'],'trust_form') )
 			return trust_form_show_input();
 		return trust_form_show_confirm();
 
-	} elseif ( ( isset( $_POST['send-to-finish'] ) || ( isset($_POST['mode']) && $_POST['mode'] == 'finish' ) ) && !$trust_form->is_spam() && $trust_form->validate() ) {
+	} elseif ( ( isset( $_POST['send-to-finish'] ) || isset( $_POST['send-to-finish_x'] ) || ( isset($_POST['mode']) && $_POST['mode'] == 'finish' ) ) && !$trust_form->is_spam() && $trust_form->validate() ) {
 		if ( empty($_POST) || !wp_verify_nonce($_POST['trust_form_confirm_nonce_field'],'trust_form') )
 			return trust_form_show_input();
 
