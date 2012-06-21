@@ -2,8 +2,8 @@
 Contributors: horike
 Tags:  form, contact form, contact
 Requires at least: 3.3
-Tested up to: 3.3
-Stable tag: 1.3.9
+Tested up to: 3.4
+Stable tag: 1.4.0
 
 Trust Form is a contact form with confirmation screen and mail and data base support.
 
@@ -58,3 +58,5 @@ Please contact to me.
 * Add Akismet spam filtering
 = 1.3.8 =
 * When you write define( 'TRUST_FORM_DB_SUPPORT', false ); in wp-config.php, don't store in DB.
+= 1.4.0 =
+* Add form duplicate

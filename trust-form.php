@@ -4,7 +4,7 @@ Plugin Name: Trust Form
 Plugin URI: http://www.kakunin-pl.us/
 Description: Trust Form is a contact form with confirmation screen and mail and data base support.
 Author: horike takahiro
-Version: 1.3.9
+Version: 1.4.0
 Author URI: http://www.kakunin-pl.us/
 
 
@@ -29,7 +29,7 @@ if ( ! defined( 'TRUST_FORM_DOMAIN' ) )
 	define( 'TRUST_FORM_DOMAIN', 'trust-form' );
 	
 if ( ! defined( 'TRUST_FORM_PLUGIN_URL' ) )
-	define( 'TRUST_FORM_PLUGIN_URL', WP_PLUGIN_URL . '/' . dirname( plugin_basename( __FILE__ ) ));
+	define( 'TRUST_FORM_PLUGIN_URL', plugins_url() . '/' . dirname( plugin_basename( __FILE__ ) ));
 
 if ( ! defined( 'TRUST_FORM_PLUGIN_DIR' ) )
 	define( 'TRUST_FORM_PLUGIN_DIR', WP_PLUGIN_DIR . '/' . dirname( plugin_basename( __FILE__ ) ));
@@ -123,6 +123,69 @@ class Trust_Form {
 			}
 
 			switch ( $doaction ) {
+				case 'duplicate':
+					$duplicated = 0;
+					foreach( (array) $form_ids as $form_id ) {
+						$post = get_post( $form_id );
+
+						$post_title = sprintf( __( 'Copy of %s', TRUST_FORM_DOMAIN ), $post->post_title );
+
+						$new = array(
+							'post_author' => $post->post_author,
+							'post_date' => $post->post_date,
+							'post_date_gmt' => $post->post_date_gmt,
+							'post_content' => $post->post_content,
+							'post_title' => $post_title,
+							'post_excerpt' => $post->post_excerpt,
+							'post_status' => $post->post_status,
+							'comment_status' => $post->comment_status,
+							'ping_status' => $post->ping_status,
+							'post_password' => $post->post_password,
+							'post_name' => $post->post_name,
+							'to_ping' => $post->to_ping,
+							'pinged' => $post->pinged,
+							'post_modified' => $post->post_modified,
+							'post_modified_gmt' => $post->post_modified_gmt,
+							'post_content_filtered' => $post->post_content_filtered,
+							'post_parent' => $post->post_parent,
+							'guid' => $post->guid,
+							'menu_order' => $post->menu_order,
+							'post_type' => $post->post_type,
+							'post_mime_type' => $post->post_mime_type,
+							'comment_count' => $post->comment_count
+						);
+						if ( !$new_id = wp_insert_post($new) )
+							wp_die( __('Error in duplicating.') );
+						
+						$data = array( 
+									'name' => get_post_meta( $form_id, 'name' ),
+									'attention' => get_post_meta( $form_id, 'attention' ),
+									'type' => get_post_meta( $form_id, 'type' ),
+									'validation' => get_post_meta( $form_id, 'validation' ),
+									'attr' => get_post_meta( $form_id, 'attr' ),
+									'admin_mail' => get_post_meta( $form_id, 'admin_mail' ),
+									'user_mail' => get_post_meta( $form_id, 'user_mail' ),
+									'form_admin' => get_post_meta( $form_id, 'form_admin' ),
+									'form_front' => get_post_meta( $form_id, 'form_front' ),
+									'config' => get_post_meta( $form_id, 'config' )
+								);
+						update_post_meta( $new_id, 'name', $data['name'][0] );
+						update_post_meta( $new_id, 'attention', $data['attention'][0] );
+						update_post_meta( $new_id, 'type', $data['type'][0] );
+						update_post_meta( $new_id, 'validation', $data['validation'][0] );
+						update_post_meta( $new_id, 'attr', $data['attr'][0] );
+						update_post_meta( $new_id, 'admin_mail', $data['admin_mail'][0] );
+						update_post_meta( $new_id, 'user_mail', $data['user_mail'][0] );
+						update_post_meta( $new_id, 'form_admin', $data['form_admin'][0] );
+						update_post_meta( $new_id, 'form_front', $data['form_front'][0] );
+						update_post_meta( $new_id, 'config', $data['config'][0] );
+
+						@copy( $this->plugin_dir . '/css/front.css', $this->plugin_dir . '/css/front_'.$new_id.'.css' );
+
+						$duplicated++;
+					}
+					$sendback = add_query_arg( array('duplicated' => $duplicated, 'ids' => join(',', $form_ids), 'message' => 'form_duplicate' ), $sendback );
+					break;
 				case 'trash':
 					$trashed = 0;
 					foreach( (array) $form_ids as $form_id ) {
@@ -1396,18 +1459,18 @@ class Trust_Form_Edit_List_Table extends WP_List_Table {
 	function column_title( $item ) {
 		if ( $this->status == '' ) {
 			$trash_url = sprintf( '?page=%s&action=%s&form=%s' ,$_REQUEST['page'], 'trash', $item['ID'] );
+			$duplicate_url = sprintf( '?page=%s&action=%s&form=%s', $_REQUEST['page'], 'duplicate', $item['ID'] );
 			$actions = array (
 				'edit'      => sprintf( '<a href="?page=%s&action=%s&form=%s">' .__( 'Edit', TRUST_FORM_DOMAIN ). '</a>', $_REQUEST['page'], 'edit', $item['ID'] ),
 				'trash'     => '<a href="'.wp_nonce_url( $trash_url, 'bulk-forms').'">' .__( 'Move to Trash', TRUST_FORM_DOMAIN ). '</a>',
-				//'duplicate' => sprintf( '<a href="?page=%s&action=%s&form=%s">' .__( 'Duplicate', TRUST_FORM_DOMAIN ). '</a>', $_REQUEST['page'], 'duplicate', $item['ID'] )
+				'duplicate' => '<a href="'.wp_nonce_url( $duplicate_url, 'bulk-forms').'">' .__( 'Duplicate', TRUST_FORM_DOMAIN ). '</a>'
 			);
 		} elseif ( $this->status == 'trash' ){
 			$delete_url = sprintf( '?page=%s&action=%s&form=%s' ,$_REQUEST['page'], 'delete', $item['ID'] );
 			$restore_url = sprintf( '?page=%s&action=%s&form=%s' ,$_REQUEST['page'], 'untrash', $item['ID'] );
 			$actions = array (
 				'restore'    => '<a href="'.wp_nonce_url( $restore_url, 'bulk-forms').'">' .__( 'Restore', TRUST_FORM_DOMAIN ). '</a>',
-				'delete'     => '<a href="'.wp_nonce_url( $delete_url, 'bulk-forms').'">' .__( 'Delete Permanently', TRUST_FORM_DOMAIN ). '</a>',
-				//'duplicate' => sprintf( '<a href="?page=%s&action=%s&form=%s">' .__( 'Duplicate', TRUST_FORM_DOMAIN ). '</a>', $_REQUEST['page'], 'duplicate', $item['ID'] )
+				'delete'     => '<a href="'.wp_nonce_url( $delete_url, 'bulk-forms').'">' .__( 'Delete Permanently', TRUST_FORM_DOMAIN ). '</a>'
 			);
 		}
 
@@ -1474,7 +1537,7 @@ class Trust_Form_Edit_List_Table extends WP_List_Table {
 		if ( $this->status == '' ) {
 			$actions = array(
 				'trash'     => __( 'Move to Trash', TRUST_FORM_DOMAIN ),
-				//'duplicate' => __( 'Duplicate', TRUST_FORM_DOMAIN )
+				'duplicate' => __( 'Duplicate', TRUST_FORM_DOMAIN )
 			);
 		} elseif ( $this->status == 'trash' ) {
 			$actions = array(
@@ -1898,6 +1961,7 @@ EOT;
 	 * @since	1.0
 	 */
 	public function get_element( $key ) {
+
 		$class = isset($this->attr[0]['class'][$key]) && $this->attr[0]['class'][$key] != '' ? 'class="'.esc_html($this->attr[0]['class'][$key]).'"' : '';
 		switch ( $this->type[0][$key] ) {
 			case 'text':

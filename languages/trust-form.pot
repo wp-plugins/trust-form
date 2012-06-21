@@ -441,3 +441,27 @@ msgstr ""
 msgid "Change Status"
 msgstr ""
 
+msgid "Duplicate"
+msgstr ""
+
+msgid "Copy of %s"
+msgstr ""
+
+msgid "Item moved to the Trash."
+msgstr ""
+
+msgid "%d items moved to the Trash."
+msgstr ""
+
+msgid "Item restored from the Trash."
+msgstr ""
+
+msgid "%d items restored from the Trash."
+msgstr ""
+
+msgid "Item duplicated."
+msgstr ""
+
+msgid "%d items duplicated."
+msgstr ""
+

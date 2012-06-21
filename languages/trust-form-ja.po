@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Trust Forms\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-09-19 22:01+0900\n"
-"PO-Revision-Date: 2012-05-29 21:52+0900\n"
+"PO-Revision-Date: 2012-06-21 23:19+0900\n"
 "Last-Translator: horike <horike@digitalcube.jp>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -452,4 +452,28 @@ msgstr "投稿の一覧に戻る"
 
 msgid "Change Status"
 msgstr "ステータスを変更"
+
+msgid "Copy of %s"
+msgstr "%s の複製"
+
+msgid "Duplicate"
+msgstr "複製"
+
+msgid "Item moved to the Trash."
+msgstr "ゴミ箱へ移動しました"
+
+msgid "%d items moved to the Trash."
+msgstr "%d個の項目をゴミ箱へ移動しました"
+
+msgid "Item restored from the Trash."
+msgstr "ゴミ箱から復元しました"
+
+msgid "%d items restored from the Trash."
+msgstr "%d個の項目をゴミ箱から復元しました"
+
+msgid "Item duplicated."
+msgstr "複製しました"
+
+msgid "%d items duplicated."
+msgstr "%d個の項目を複製しました"
 
