@@ -4,7 +4,7 @@ Plugin Name: Trust Form
 Plugin URI: http://www.kakunin-pl.us/
 Description: Trust Form is a contact form with confirmation screen and mail and data base support.
 Author: horike takahiro
-Version: 1.4.1
+Version: 1.4.2
 Author URI: http://www.kakunin-pl.us/
 
 
@@ -2075,7 +2075,7 @@ EOT;
 		$new_responce["trash"] = 'false';
 		$new_responce["note"] = array();
 		$responce[0][0] = '';
-		$new_responce = apply_filters( 'tr_new_responce', $new_responce, $this->type[0] );
+		$new_responce = apply_filters( 'tr_new_responce', $new_responce, $this->type[0], $this->id );
 		$responce[0][]  = $new_responce;
 		unset($responce[0][0]);
 		
@@ -2118,7 +2118,7 @@ EOT;
 	 * @since	1.01
 	 */
 	private function _send_user_mail( $id, $data, $to ){
-		$data['data'] = apply_filters( 'tr_pre_auto_reply_mail', $data['data'] );
+		$data['data'] = apply_filters( 'tr_pre_auto_reply_mail', $data['data'], $id );
 		$body = '';
 		foreach ( $data['data'] as $key => $res ) {
 			if ( $key == 'date' ) {
@@ -2133,7 +2133,7 @@ EOT;
 			$body = str_replace( '['.$key.']', $res, $body );
 		}
 		
-		$body = apply_filters( 'tr_pre_auto_reply_mail_body', $body, $data['data'] );
+		$body = apply_filters( 'tr_pre_auto_reply_mail_body', $body, $data['data'], $id );
 		
 		wp_mail( $to, $this->user_mail[0]['subject2'], $body );
 	}
@@ -2145,7 +2145,7 @@ EOT;
 	 * @since	1.0
 	 */
 	private function _send_admin_mail( $id, $data ){
-		$data['data'] = apply_filters( 'tr_pre_admin_mail', $data['data'] );
+		$data['data'] = apply_filters( 'tr_pre_admin_mail', $data['data'], $id );
 		$body = '';
 		if ( !defined( 'TRUST_FORM_DB_SUPPORT' ) || TRUST_FORM_DB_SUPPORT !== false ) {
 			$body .= site_url( '/wp-admin/admin.php?page=trust-form-entries&form='.$id.'&status=new' );
@@ -2153,15 +2153,18 @@ EOT;
 		}
 		foreach ( $data['data'] as $key => $res ) {
 			if ( $key == 'date' ) {
-				$body .= __( 'Date', TRUST_FORM_DOMAIN ).': '.$res."\n\n";
+				$body .= apply_filters( 'tr_pre_date_admin_mail', __( 'Date', TRUST_FORM_DOMAIN ).': '.$res."\n\n", $id );
 			} else {
-				$body .= $data['title'][$key].': '.$res."\n\n";
+				$body .= apply_filters( 'tr_pre_title_admin_mail', $data['title'][$key].': '.$res."\n\n", $id );
 			}
 		}
+		$body = apply_filters( 'tr_pre_send_mail', $body, $data['data'], $id );
+		$subject = apply_filters( 'tr_subject_admin_mail', $this->admin_mail[0]['subject'], $data['data'], $id );
+
 		$headers = '';
 		$headers .= $this->admin_mail[0]['cc'] != '' ? 'cc:' . $this->admin_mail[0]['cc'] . "\n" : '' ;
 		$headers .= $this->admin_mail[0]['bcc'] != '' ? 'bcc:' . $this->admin_mail[0]['bcc'] . "\n" : '' ;
-		wp_mail( $this->admin_mail[0]['to'], $this->admin_mail[0]['subject'], $body, $headers );
+		wp_mail( $this->admin_mail[0]['to'], $subject, $body, $headers );
 	}
 
 	public function wp_mail_from( $mail_from ) {
