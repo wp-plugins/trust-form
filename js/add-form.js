@@ -105,7 +105,9 @@ var addTrustForm,TR_element_count = 0;
 			//各要素の編集メニューを表示させるクリックイベント
 			a(".edit-button").live("click", function(){
 				var p = a(this).nextAll(".text-edit-content");
+				var hi = a(this).closest('td').height();
 				p.toggleClass('display-out').draggable();
+				a(this).closest('.edit-element-container').height(hi);
 				a(".del-icon").live("click", function(){
 					p.addClass('display-out');
 				});
