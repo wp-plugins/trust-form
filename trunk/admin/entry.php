@@ -1,9 +1,9 @@
 <?php
 $form  = isset($_GET['form'])&&is_numeric($_GET['form']) ? $_GET['form'] : -1;
 $entry = isset($_GET['entry'])&&is_numeric($_GET['entry']) ? $_GET['entry'] : -1; 
-$responce = get_post_meta( $form, 'responce' );
+$responce = get_post_meta( $form, 'answer' );
 
-$status = $responce[0][$entry]['status'];
+$status = $responce[$entry]['status'];
 if ( $status == 'new' ) {
 	$status_msg = __( 'New', TRUST_FORM_DOMAIN );
 	$status_class = '';
@@ -23,12 +23,12 @@ if ( $status == 'new' ) {
 <h3 <?php echo $status_class; ?>><span><?php echo esc_html( __( 'Entry', TRUST_FORM_DOMAIN ) ); ?></span></h3>
 <table id="entry-detail">
 <?php
-foreach ( $responce[0][$entry]['title'] as $key => $e ){
+foreach ( $responce[$entry]['title'] as $key => $e ){
 ?>
-<tr><th scope="row"><?php echo esc_html($e); ?></th><td><?php echo str_replace( "\n", '<br />', esc_html($responce[0][$entry]['data'][$key])); ?></td></tr>
+<tr><th scope="row"><?php echo esc_html($e); ?></th><td><?php echo str_replace( "\n", '<br />', esc_html($responce[$entry]['data'][$key])); ?></td></tr>
 <?php
 }
-$notes = $responce[0][$entry]['note'];
+$notes = $responce[$entry]['note'];
 ?>
 </table>
 </div>
