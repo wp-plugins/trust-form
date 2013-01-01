@@ -18,7 +18,7 @@ $form_config = !isset( $_GET['action'] ) || 'edit' != $_GET['action'] ? '' : get
 add_meta_box( 'standard-form', __( 'Standard Field', TRUST_FORM_DOMAIN ), 'trustform_standard_form_meta_box', 'trustform', 'advanced', 'core' );
 add_meta_box( 'advanced-form', __( 'Advanced Field', TRUST_FORM_DOMAIN ), 'trustform_advanced_form_meta_box', 'trustform', 'advanced', 'core' );
 
-do_meta_boxes( 'trustform', 'advanced', &$this );
+do_meta_boxes( 'trustform', 'advanced', $this );
 wp_nonce_field( 'meta-box-order', 'meta-box-order-nonce', false );
 wp_nonce_field( 'closedpostboxes', 'closedpostboxesnonce', false );
 
@@ -386,7 +386,7 @@ function trustform_advanced_form_meta_box() {
 <?php
 
 add_meta_box( 'admin-mail', __( 'Admin Mail', TRUST_FORM_DOMAIN ), 'trustform_admin_mail_meta_box', 'trustform', 'normal', 'core' );
-do_meta_boxes( 'trustform', 'normal', &$this );
+do_meta_boxes( 'trustform', 'normal', $this );
 
 function trustform_admin_mail_meta_box() {
 $form_id = !isset( $_GET['form'] ) || !is_numeric($_GET['form']) ? '' : $_GET['form'] ;
@@ -405,7 +405,7 @@ $admin_mail = !isset( $_GET['action'] ) || 'edit' != $_GET['action'] ? '' : get_
 <?php
 }
 add_meta_box( 'auto-reply-mail', __( 'Auto-reply Mail', TRUST_FORM_DOMAIN ), 'trustform_auto_reply_mail_meta_box', 'trustform', 'default', 'core' );
-do_meta_boxes( 'trustform', 'default', &$this );
+do_meta_boxes( 'trustform', 'default', $this );
 function trustform_auto_reply_mail_meta_box() {
 $form_id = !isset( $_GET['form'] ) || !is_numeric($_GET['form']) ? '' : $_GET['form'] ;
 $user_mail = !isset( $_GET['action'] ) || 'edit' != $_GET['action'] ? '' : get_post_meta( $form_id, 'user_mail' ) ;

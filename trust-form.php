@@ -57,7 +57,7 @@ class Trust_Form {
 	public function __construct() {
 
 		$this->base_dir = dirname( plugin_basename( __FILE__ ) );
-		$this->plugin_url = WP_PLUGIN_URL . '/' .$this->base_dir;
+		$this->plugin_url = plugins_url() . '/' .$this->base_dir;
 		$this->plugin_dir = WP_PLUGIN_DIR . '/' .$this->base_dir;
 		$this->admin_dir = $this->plugin_dir . '/admin';
 		$this->admin_css_dir = $this->plugin_dir . '/css';
