@@ -4,7 +4,7 @@ Plugin Name: Trust Form
 Plugin URI: http://www.kakunin-pl.us/
 Description: Trust Form is a contact form with confirmation screen and mail and data base support.
 Author: horike takahiro
-Version: 1.4.2
+Version: 1.5
 Author URI: http://www.kakunin-pl.us/
 
 
@@ -25,6 +25,26 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+register_activation_hook( __FILE__, 'trust_form_install' );
+function trust_form_install() {
+	if ( !get_option('trust_form_install_ver15') ) {
+		$forms = get_posts(array( 'numberposts' => -1, 'post_type' => 'trust-form' ));
+		if ( is_array($forms) ) {
+			foreach ( $forms as $form ) {
+				$res = get_post_meta( $form->ID, 'responce', true );
+				if ( is_array($res) ) {
+					foreach ( $res as $r ) {
+						add_post_meta( $form->ID, 'answer', $r );
+					}
+				}
+			//delete_post_meta( $form->ID, 'responce' );
+			}
+		}
+		update_option('trust_form_install_ver15', 1);
+	}
+}
+
+
 if ( ! defined( 'TRUST_FORM_DOMAIN' ) )
 	define( 'TRUST_FORM_DOMAIN', 'trust-form' );
 	
@@ -37,7 +57,7 @@ if ( ! defined( 'TRUST_FORM_PLUGIN_DIR' ) )
 new Trust_Form();
 
 class Trust_Form {
-	private $version = '1.3.7';
+	private $version = '1.5';
 	private $edit_page;
 	private $entries_page;
 	private $base_dir;
@@ -264,14 +284,14 @@ class Trust_Form {
 		if( isset($_REQUEST['csv-dl']) ) {
 			$status = isset($_REQUEST['type']) ? $_REQUEST['type'] : 'all';
 			$name = get_post_meta( $form, 'name' );
-			$responce = get_post_meta( $form, 'responce' );
+			$responce = get_post_meta( $form, 'answer' );
 			$csv_ti = array();
 			$csv = array();
 			$count = 0;
 			foreach ( $name[0] as $key => $title ) {
 				$csv_ti[0][$count] = $title;
 				$data_count = 0;
-				foreach ( $responce[0] as $res ) {
+				foreach ( $responce as $res ) {
 					if ( $status == 'all' || $status == $res['status'] ) {
 						$csv[$data_count][$count] = isset($res['data'][$key]) ? $res['data'][$key] : '' ;
 						$data_count++;
@@ -282,7 +302,7 @@ class Trust_Form {
 
 			$csv_ti[0][$count] = __( 'Status', TRUST_FORM_DOMAIN );
 			$data_count = 0;
-			foreach ( $responce[0] as $res ) {
+			foreach ( $responce as $res ) {
 				if ( $status == 'all' || $status == $res['status'] ) {
 					if ( $res['status'] == 'new' ) {
 						$csv[$data_count][$count] = __( 'New', TRUST_FORM_DOMAIN );
@@ -296,7 +316,7 @@ class Trust_Form {
 
 			$csv_ti[0][$count] = __( 'Entry Date', TRUST_FORM_DOMAIN );
 			$data_count = 0;
-			foreach ( $responce[0] as $res ) {
+			foreach ( $responce as $res ) {
 				if ( $status == 'all' || $status == $res['status'] ) {
 					$csv[$data_count][$count] = isset($res['data']['date']) ? $res['data']['date'] : '' ;
 					$data_count++;
@@ -351,25 +371,27 @@ class Trust_Form {
 				$doaction = 'delete';
 			} elseif ( isset( $_REQUEST['ids'] ) ) {
 				$entry_ids = explode( ',', $_REQUEST['ids'] );
-			} elseif ( !empty( $_REQUEST['entry'] ) ) {
+			} elseif ( isset( $_REQUEST['entry'] ) ) {
 				$entry_ids = is_array( $_REQUEST['entry'] ) ? $_REQUEST['entry'] : explode( ',', $_REQUEST['entry'] );
 			}
+
 			if ( !isset( $entry_ids ) ) {
 				wp_redirect( $sendback );
 				exit();
 			}
 
-			$responce = get_post_meta( $form, 'responce' );
+			$responce = get_post_meta( $form, 'answer' );
 			switch ( $doaction ) {
 				case 'trash':
 
 					$trashed = 0;
 					foreach( (array) $entry_ids as $entry_id ) {
-						if ( $responce[0][$entry_id]['trash'] == 'true' ) {
+						if ( $responce[$entry_id]['trash'] == 'true' ) {
 							wp_die( __('Error in moving to Trash.') );
 						} else {
-							$responce[0][$entry_id]['trash'] = 'true';
-							update_post_meta( $form, 'responce', $responce[0] );
+							$prev_value = $responce[$entry_id];
+							$responce[$entry_id]['trash'] = 'true';
+							update_post_meta( $form, 'answer', $responce[$entry_id], $prev_value );
 						}
 
 						$trashed++;
@@ -379,11 +401,12 @@ class Trust_Form {
 				case 'read':
 					$read = 0;
 					foreach( (array) $entry_ids as $entry_id ) {
-						if ( $responce[0][$entry_id]['status'] == 'read' ) {
+						if ( $responce[$entry_id]['status'] == 'read' ) {
 							wp_die( __('Error in moving to Read.') );
 						} else {
-							$responce[0][$entry_id]['status'] = 'read';
-							update_post_meta( $form, 'responce', $responce[0] );
+							$prev_value = $responce[$entry_id];
+							$responce[$entry_id]['status'] = 'read';
+							update_post_meta( $form, 'answer', $responce[$entry_id], $prev_value );
 						}
 						$read++;
 					}
@@ -392,11 +415,12 @@ class Trust_Form {
 				case 'new':
 					$new = 0;
 					foreach( (array) $entry_ids as $entry_id ) {
-						if ( $responce[0][$entry_id]['status'] == 'new' ) {
+						if ( $responce[$entry_id]['status'] == 'new' ) {
 							wp_die( __('Error in moving to Read.') );
 						} else {
-							$responce[0][$entry_id]['status'] = 'new';
-							update_post_meta( $form, 'responce', $responce[0] );
+							$prev_value = $responce[$entry_id];
+							$responce[$entry_id]['status'] = 'new';
+							update_post_meta( $form, 'answer', $responce[$entry_id], $prev_value );
 						}
 						$new++;
 					}
@@ -405,11 +429,12 @@ class Trust_Form {
 				case 'untrash':
 					$untrashed = 0;
 					foreach( (array) $entry_ids as $entry_id ) {
-						if ( $responce[0][$entry_id]['trash'] == 'false' ) {
+						if ( $responce[$entry_id]['trash'] == 'false' ) {
 							wp_die( __('Error in restoring from Trash.') );
 						} else {
-							$responce[0][$entry_id]['trash'] = 'false';
-							update_post_meta( $form, 'responce', $responce[0] );
+							$prev_value = $responce[$entry_id];
+							$responce[$entry_id]['trash'] = 'false';
+							update_post_meta( $form, 'answer', $responce[$entry_id], $prev_value );
 						}
 
 						$untrashed++;
@@ -419,11 +444,10 @@ class Trust_Form {
 				case 'delete':
 					$deleted = 0;
 					foreach( (array) $entry_ids as $entry_id ) {
-						if ( !isset($responce[0][$entry_id]) ) {
+						if ( !isset($responce[$entry_id]) ) {
 							wp_die( __('Error in deleting...') );
 						} else {
-							unset($responce[0][$entry_id]);
-							update_post_meta( $form, 'responce', $responce[0] );
+							delete_post_meta( $form, 'answer', $responce[$entry_id] );
 						}
 
 						$deleted++;
@@ -440,19 +464,20 @@ class Trust_Form {
 				wp_die( __('Error add note') );
 			} else {
 				$entry    = isset($_REQUEST['entry']) ? $_REQUEST['entry'] : -1;
-				$responce = get_post_meta( $form, 'responce' );
+				$responce = get_post_meta( $form, 'answer' );
 				$current_user = wp_get_current_user();
-				$responce[0][$entry]['note'][] = array( 'display_name' => $current_user->display_name,
+				$prev_value = $responce[$entry];
+				$responce[$entry]['note'][] = array( 'display_name' => $current_user->display_name,
 														'mail'         => $current_user->user_email,
 														'date'         => date_i18n('Y/m/d H:i:s'),
 														'note'         => $_POST['add_note'],
 														'status'       => $_POST['entry_status']
 													 );
 				
-				if ( $responce[0][$entry]{'status'} != $_REQUEST['entry_status'] ) {
-					$responce[0][$entry]{'status'} = $_REQUEST['entry_status'];
+				if ( $responce[$entry]{'status'} != $_REQUEST['entry_status'] ) {
+					$responce[$entry]{'status'} = $_REQUEST['entry_status'];
 				}
-				update_post_meta( $form, 'responce', $responce[0] );
+				update_post_meta( $form, 'answer', $responce[$entry], $prev_value );
 			}
 		} elseif ( ! empty($_REQUEST['_wp_http_referer']) ) {
 			wp_safe_redirect( remove_query_arg( array('_wp_http_referer', '_wpnonce'), stripslashes($_SERVER['REQUEST_URI']) ) );
@@ -1043,10 +1068,9 @@ class Trust_Form_Entries_List_Table extends WP_List_Table {
 		$this->max = $this->colums_count < $this->max ? $this->colums_count : $this->max;
 		$this->status = isset( $_GET['status'] ) ? $_GET['status'] : '';
 		
-		$this->responce = get_post_meta( $this->id, 'responce' );
-
-		if ( $this->responce != array() ) {
-			foreach( $this->responce[0] as $key => $res ){
+		$this->responce = get_post_meta( $this->id, 'answer' );
+		if ( !empty($this->responce) ) {
+			foreach( $this->responce as $key => $res ){
 				if ( $this->status == '' && $res['trash'] == 'true' || $this->status == 'trash' && $res['trash'] == 'false' || $this->status != '' && $this->status != 'trash' && ( $this->status != $res['status'] || $this->status == $res['status'] && $res['trash'] == 'true' ) )
 					continue;
 				
@@ -1100,21 +1124,21 @@ class Trust_Form_Entries_List_Table extends WP_List_Table {
 	function entries_count( $status = '' ) {
 		$count = 0; 
 
-		if ( $this->responce == array() )
+		if ( empty($this->responce) )
 			return $count;
 		
 		if ( $status == '' ) {
-			foreach ( $this->responce[0] as $key => $res ) {
+			foreach ( $this->responce as $key => $res ) {
 				if ( $res['trash'] == 'false' )
 					$count++;
 			}
 		} elseif ( $status == 'trash' ) {
-			foreach ( $this->responce[0] as $key => $res ) {
+			foreach ( $this->responce as $key => $res ) {
 				if ( $res['trash'] == 'true' )
 					$count++;
 			}
 		} else {
-			foreach ( $this->responce[0] as $key => $res ) {
+			foreach ( $this->responce as $key => $res ) {
 				if ( $res['trash'] == 'false' && $res['status'] == $status )
 					$count++;
 			}
@@ -1134,7 +1158,7 @@ class Trust_Form_Entries_List_Table extends WP_List_Table {
 	function single_row( $item ) {
 		static $row_class = '';
 		//$row_class = ( $row_class == '' ? ' class="alternate"' : '' );
-		$row_class = $this->status == '' && $this->responce[0][$item['ID']]['status'] == 'read' ? ' class="read"' : '' ;
+		$row_class = $this->status == '' && $this->responce[$item['ID']]['status'] == 'read' ? ' class="read"' : '' ;
 
 		echo '<tr' . $row_class . '>';
 		echo $this->single_row_columns( $item );
@@ -1150,14 +1174,14 @@ class Trust_Form_Entries_List_Table extends WP_List_Table {
 	function column_entry_0( $item ) {
 		if ( $this->status == '' ) {
 			$trash_url  = sprintf( '?page=%s&action=%s&form=%s&entry=%s' ,$_REQUEST['page'], 'trash', $this->id, $item['ID'] );
-			if ( $this->responce[0][$item['ID']]['status'] == 'new' ) {
+			if ( $this->responce[$item['ID']]['status'] == 'new' ) {
 				$read_url = sprintf( '?page=%s&action=%s&form=%s&entry=%s' ,$_REQUEST['page'], 'read', $this->id, $item['ID'] );
 				$actions = array (
 					'view'     => sprintf( '<a href="?page=%s&action=%s&form=%s&entry=%s">'.__( 'View', TRUST_FORM_DOMAIN ).'</a>', $_REQUEST['page'], 'edit', $this->id, $item['ID'] ),
 					'read'   => '<a href="'.wp_nonce_url( $read_url, 'bulk-entries' ).'">'.__( 'Move to Read', TRUST_FORM_DOMAIN ).'</a>',
 					'trash'    => '<a href="'.wp_nonce_url( $trash_url, 'bulk-entries' ).'">'.__( 'Move to Trash', TRUST_FORM_DOMAIN ).'</a>'
 				);
-			} elseif ( $this->responce[0][$item['ID']]['status'] == 'read' ) {
+			} elseif ( $this->responce[$item['ID']]['status'] == 'read' ) {
 				$new_url = sprintf( '?page=%s&action=%s&form=%s&entry=%s' ,$_REQUEST['page'], 'new', $this->id, $item['ID'] );
 				$actions = array (
 					'view'     => sprintf( '<a href="?page=%s&action=%s&form=%s&entry=%s">'.__( 'View', TRUST_FORM_DOMAIN ).'</a>', $_REQUEST['page'], 'edit', $this->id, $item['ID'] ),
@@ -1208,7 +1232,7 @@ class Trust_Form_Entries_List_Table extends WP_List_Table {
 					'<input type="checkbox" name="%1$s[]" value="%2$s" />',
 					$this->_args['singular'],
 					$item['ID']
-        );
+		);
 	}
 	
 	/* ==================================================
@@ -2070,7 +2094,7 @@ EOT;
 	 * @since	1.0
 	 */
 	public function save() {
-		$responce = get_post_meta( $this->id, 'responce' );
+//		$responce = get_post_meta( $this->id, 'responce' );
 		$new_responce = array();
 		foreach( $this->name[0] as $key => $name ) {
 			switch ( $this->type[0][$key] ) {
@@ -2093,15 +2117,15 @@ EOT;
 		$new_responce["status"] = 'new';
 		$new_responce["trash"] = 'false';
 		$new_responce["note"] = array();
-		$responce[0][0] = '';
+//		$responce[0][0] = '';
 		$new_responce = apply_filters( 'tr_new_responce', $new_responce, $this->type[0], $this->id );
-		$responce[0][]  = $new_responce;
-		unset($responce[0][0]);
+//		$responce[0][] = $new_responce;
+//		unset($responce[0][0]);
 		
-		$responce[0] = apply_filters( 'tr_save_posts', $responce[0] );
+//		$responce[0] = apply_filters( 'tr_save_posts', $responce[0] );
 
 		if ( !defined( 'TRUST_FORM_DB_SUPPORT' ) || TRUST_FORM_DB_SUPPORT !== false )
-			update_post_meta( $this->id, 'responce', $responce[0] );
+			add_post_meta( $this->id, 'answer', $new_responce );
 		
 		if ( $this->user_mail[0]['user_mail_y'] === '1' ) {
 			foreach( $this->name[0] as $key => $name ) {
