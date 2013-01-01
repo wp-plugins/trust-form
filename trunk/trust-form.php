@@ -69,6 +69,7 @@ class Trust_Form {
 		
 		load_plugin_textdomain( TRUST_FORM_DOMAIN, $this->absolute_lang_path, $this->relative_lang_path );
 		
+		add_action( 'init', array( &$this, 'register_post_type' ) );
 		if ( is_admin() ) {
 			add_action( 'admin_init', array( &$this, 'edit_admin_init' ) );
 			add_action( 'admin_init', array( &$this, 'entries_admin_init' ) );
@@ -81,6 +82,24 @@ class Trust_Form {
 		} else {
 			add_action( 'wp_print_styles', array( &$this, 'add_front_styles') );
 		} 
+	}
+
+	/* ==================================================
+	 * register_post_type
+	 * @param	none
+	 * @return	Void
+	 * @since	1.0
+	 */
+	public function register_post_type() {
+		register_post_type( 'trust-form', 
+							array( 
+								'labels' => array( 'name' => __( 'Trust Form', TRUST_FORM_DOMAIN ) ),
+								'public' => false,
+								'hierarchical' => false,
+								'supports' => array( 'title', 'editor', 'custom-fields' ),
+								'rewrite' => false,
+								'can_export' => true,
+								 ) );
 	}
 
 	/* ==================================================
