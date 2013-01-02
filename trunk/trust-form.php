@@ -1755,13 +1755,13 @@ function trust_form_shortcode($atts) {
 		return false;
 
 	$trust_form = new Trust_Form_Front($id);
-	
+
 	if (file_exists(get_stylesheet_directory(). '/trust-form-tpl-'.$id.'.php')) {
 		require_once(get_stylesheet_directory(). '/trust-form-tpl-'.$id.'.php');
-
+	} elseif (file_exists(get_stylesheet_directory(). '/trust-form-tpl-.php')) {
+		require_once(get_stylesheet_directory(). '/trust-form-tpl-.php');
 	} else {
 		require_once(TRUST_FORM_PLUGIN_DIR. '/trust-form-tpl-.php');
-
 	}
 
 	if ( ( isset( $_POST['send-to-confirm'] ) || isset( $_POST['send-to-confirm_x'] ) || ( isset($_POST['mode']) && $_POST['mode'] == 'confirm' ) ) && $trust_form->validate() ) {
