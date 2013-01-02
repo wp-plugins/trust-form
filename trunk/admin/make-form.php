@@ -1,8 +1,11 @@
 <?php
 $display = !isset( $_GET['action'] ) || 'edit' != $_GET['action'] ? 'style="display:none;"' : '' ;
-$form_admin = !isset( $_GET['action'] ) || 'edit' != $_GET['action'] ? '' : get_post_meta( $this->form_id, 'form_admin' ) ;
+$form_admin_input = !isset( $_GET['action'] ) || 'edit' != $_GET['action'] ? '' : get_post_meta( $this->form_id, 'form_admin_input', true );
+$form_admin_confirm = !isset( $_GET['action'] ) || 'edit' != $_GET['action'] ? '' : get_post_meta( $this->form_id, 'form_admin_confirm', true );
+$form_admin_finish = !isset( $_GET['action'] ) || 'edit' != $_GET['action'] ? '' : get_post_meta( $this->form_id, 'form_admin_finish', true );
 $form_config = !isset( $_GET['action'] ) || 'edit' != $_GET['action'] ? '' : get_post_meta( $this->form_id, 'config' ) ;
 ?>
+
 <style id="front-css" type="text/css">
 </style>
 <div id="tr-notice" style="display: none; opacity: 0;">
@@ -311,8 +314,8 @@ function trustform_advanced_form_meta_box() {
 <li id="menu-require_mark"><?php echo esc_html( __( 'Require Mark', TRUST_FORM_DOMAIN ) ); ?></li>
 </ul>
 <div class="contact-form contact-form-input">
-<?php if ( $form_admin !='' ) : ?>
-<?php echo $form_admin[0]['input'] ?>
+<?php if ( $form_admin_input !='' ) : ?>
+<?php echo $form_admin_input; ?>
 <?php  else : ?>
 <!-- HTML -->
 <p id="info-message-input"><?php echo esc_html( __( 'Please Edit Text', TRUST_FORM_DOMAIN ) ); ?></p>
@@ -342,8 +345,8 @@ function trustform_advanced_form_meta_box() {
 </div>
 <div id="tab-2">
 <div class="contact-form contact-form-confirm">
-<?php if ( $form_admin !='' ) : ?>
-<?php echo $form_admin[0]['confirm'] ?>
+<?php if ( $form_admin_confirm !='' ) : ?>
+<?php echo $form_admin_confirm; ?>
 <?php  else : ?>
 <!-- HTML -->
 <p id="info-message-confirm"><?php echo esc_html( __( 'Please Edit Text', TRUST_FORM_DOMAIN ) ); ?></p>
@@ -373,8 +376,8 @@ function trustform_advanced_form_meta_box() {
 </div>
 <div id="tab-3">
 <div class="contact-form contact-form-finish">
-<?php if ( $form_admin !='' ) : ?>
-<?php echo $form_admin[0]['finish'] ?>
+<?php if ( $form_admin_finish !='' ) : ?>
+<?php echo $form_admin_finish; ?>
 <?php  else : ?>
 <!-- HTML -->
 <p id="info-message-finish"><?php echo esc_html( __( 'Please Edit Text', TRUST_FORM_DOMAIN ) ); ?></p>

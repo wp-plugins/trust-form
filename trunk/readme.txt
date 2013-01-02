@@ -2,8 +2,8 @@
 Contributors: horike
 Tags:  form, contact form, contact
 Requires at least: 3.3
-Tested up to: 3.4
-Stable tag: 1.4.2
+Tested up to: 3.5
+Stable tag: 1.5
 
 Trust Form is a contact form with confirmation screen and mail and data base support.
 
@@ -60,3 +60,12 @@ Please contact to me.
 * When you write define( 'TRUST_FORM_DB_SUPPORT', false ); in wp-config.php, don't store in DB.
 = 1.4.0 =
 * Add form duplicate
+= 1.5.0 =
+* Set label for checkbox and radio.
+* Changed template system.
+* add an export capability.
+* Fixed a bug that does not work with PHP5.4.
+* Changed the way to hold answer data.
+* notice error fixed on confirm screen.
+* Fixed a bug that unable to re-edit the input,confirm,finish Screen HTML dialog box.
+* Fixed a bug that a contact is sent in double.
