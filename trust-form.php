@@ -2094,7 +2094,7 @@ EOT;
 	 * @since	1.0
 	 */
 	public function save() {
-//		$responce = get_post_meta( $this->id, 'responce' );
+
 		$new_responce = array();
 		foreach( $this->name[0] as $key => $name ) {
 			switch ( $this->type[0][$key] ) {
@@ -2123,6 +2123,11 @@ EOT;
 //		unset($responce[0][0]);
 		
 //		$responce[0] = apply_filters( 'tr_save_posts', $responce[0] );
+		$prev_responce = get_post_meta( $this->id, 'answer' );
+		foreach ( $prev_responce as $r ) {
+			if ( $r == $new_responce )
+				return;
+		}
 
 		if ( !defined( 'TRUST_FORM_DB_SUPPORT' ) || TRUST_FORM_DB_SUPPORT !== false )
 			add_post_meta( $this->id, 'answer', $new_responce );
