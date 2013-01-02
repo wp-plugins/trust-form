@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 register_activation_hook( __FILE__, 'trust_form_install' );
 function trust_form_install() {
-	//if ( !get_option('trust_form_install_ver15') ) {
+	if ( !get_option('trust_form_install_ver15') ) {
 		$forms = get_posts(array( 'numberposts' => -1, 'post_type' => 'trust-form' ));
 		if ( is_array($forms) ) {
 			foreach ( $forms as $form ) {
@@ -48,7 +48,7 @@ function trust_form_install() {
 			}
 		}
 		update_option('trust_form_install_ver15', 1);
-	//}
+	}
 }
 
 
