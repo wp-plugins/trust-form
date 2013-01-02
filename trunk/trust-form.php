@@ -2034,7 +2034,7 @@ EOT;
 				$checkbox = '<ul>';
 				foreach ( $this->attr[0]['value'][$key] as $check ) {
 					$checked = isset($_POST[$key]) && in_array($check, $_POST[$key]) ? 'checked="checked"' : '';
-					$checkbox .= '<li><input type="checkbox" name="'.esc_html($key).'[]" '.$checked.' '.$class.' value="'.esc_html($check).'" />'.esc_html($check).'</li>';
+					$checkbox .= '<li><label><input type="checkbox" name="'.esc_html($key).'[]" '.$checked.' '.$class.' value="'.esc_html($check).'" />'.esc_html($check).'</label></li>';
 				}
 				$checkbox .= '</ul>';
 				return $checkbox;
@@ -2043,7 +2043,7 @@ EOT;
 				$radio = '<ul>';
 				foreach ( $this->attr[0]['value'][$key] as $option ) {
 					$checked = isset($_POST[$key]) && $_POST[$key] == $option ? 'checked="checked"' : '';
-					$radio .= '<li><input type="radio" name="'.esc_html($key).'" '.$checked.' '.$class.' value="'.esc_html($option).'" />'.esc_html($option).'</li>';
+					$radio .= '<li><label><input type="radio" name="'.esc_html($key).'" '.$checked.' '.$class.' value="'.esc_html($option).'" />'.esc_html($option).'</label></li>';
 				}
 				$radio .= '</ul>';
 				return $radio;
