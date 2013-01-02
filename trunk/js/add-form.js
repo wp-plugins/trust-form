@@ -659,7 +659,7 @@ var addTrustForm,TR_element_count = 0;
 			});
 			
 			//confirm formサブミットボタンの☓ボタン押下時。編集状態を解除する
-			a("#finish-button").find(".del-icon").click(function(){
+			a("#finish-button").next().find(".del-icon").click(function(){
 				if (a(this).css("display") === "block" && p === 'stop') {
 					a(".submit-element-container").css("display", "none");
 					a(".submit-container").removeClass("element-hover-edit");
@@ -677,7 +677,7 @@ var addTrustForm,TR_element_count = 0;
 			
 			//confirm returnボタンのメッセージ変更。画像の場合はオルト
 			a("input[name=returnbutton-text]").bind("textchange", function(){
-				if (a("input[name=return-to-input]").attr("type") === "button") {
+				if (a("input[name=return-to-input]").attr("type") === "submit") {
 					a("input[name=return-to-input]").val(a(this).val());
 				}else{
 					a("input[name=return-to-input]").prop("alt", a(this).val());
