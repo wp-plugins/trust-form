@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 register_activation_hook( __FILE__, 'trust_form_install' );
 function trust_form_install() {
-	if ( !get_option('trust_form_install_ver15') ) {
+	//if ( !get_option('trust_form_install_ver15') ) {
 		$forms = get_posts(array( 'numberposts' => -1, 'post_type' => 'trust-form' ));
 		if ( is_array($forms) ) {
 			foreach ( $forms as $form ) {
@@ -37,11 +37,18 @@ function trust_form_install() {
 						add_post_meta( $form->ID, 'answer', $r );
 					}
 				}
+				$res = get_post_meta( $form->ID, 'form_admin', true );
+				if ( is_array($res) ) {
+					update_post_meta( $form->ID, 'form_admin_input', $res['input'] );
+					update_post_meta( $form->ID, 'form_admin_confirm', $res['confirm'] );
+					update_post_meta( $form->ID, 'form_admin_finish', $res['finish'] );
+				}
 			//delete_post_meta( $form->ID, 'responce' );
+			//delete_post_meta( $form->ID, 'form_admin' );
 			}
 		}
 		update_option('trust_form_install_ver15', 1);
-	}
+	//}
 }
 
 
@@ -942,7 +949,10 @@ jQuery(document).ready(function() {
 			if (array_key_exists('attr', $_POST)) {update_post_meta( $post_id, 'attr', $_POST['attr'] );}
 			if (array_key_exists('admin_mail', $_POST)) {update_post_meta( $post_id, 'admin_mail', $_POST['admin_mail'] );}
 			if (array_key_exists('user_mail', $_POST)) {update_post_meta( $post_id, 'user_mail', $_POST['user_mail'] );}
-			if (array_key_exists('form_admin', $_POST)) {update_post_meta( $post_id, 'form_admin', $_POST['form_admin'] );}
+			//if (array_key_exists('form_admin', $_POST)) {update_post_meta( $post_id, 'form_admin', $_POST['form_admin'] );}
+			if (array_key_exists('form_admin', $_POST)) {update_post_meta( $post_id, 'form_admin_input', $_POST['form_admin']['input'] );}
+			if (array_key_exists('form_admin', $_POST)) {update_post_meta( $post_id, 'form_admin_confirm', $_POST['form_admin']['confirm'] );}
+			if (array_key_exists('form_admin', $_POST)) {update_post_meta( $post_id, 'form_admin_finish', $_POST['form_admin']['finish'] );}
 			if (array_key_exists('form_front', $_POST)) {update_post_meta( $post_id, 'form_front', $_POST['form_front'] );}
 			if (array_key_exists('config', $_POST)) {update_post_meta( $post_id, 'config', $_POST['config'] );}	
 		}
