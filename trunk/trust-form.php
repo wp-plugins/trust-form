@@ -2082,7 +2082,7 @@ EOT;
 				return str_replace( "\n", '<br />', esc_html($_POST[$key])).'<input type="hidden" name="'.esc_html($key).'" value="'.esc_html($_POST[$key]).'" />';
 				break;
 			default:
-				return esc_html($_POST[$key]).'<input type="hidden" name="'.esc_html($key).'" value="'.esc_html($_POST[$key]).'" />';
+				return esc_html( isset($_POST[$key]) ? $_POST[$key] : '' ).'<input type="hidden" name="'.esc_html($key).'" value="'.esc_html( isset($_POST[$key]) ? $_POST[$key] : '' ).'" />';
 				break;
 		}
 	}
