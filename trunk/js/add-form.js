@@ -465,7 +465,7 @@ var addTrustForm,TR_element_count = 0;
 			);
 			
 			//input form 上部のHTMLに対するアウタークリック
-			a('#message-container-input').outerClick(function(){
+/*			a('#message-container-input').outerClick(function(){
 				if (a(this).children("textarea").length && d === 'stop' ) {
 					if (a(this).children("textarea").val()){
 						v = a(this).children("textarea").val();
@@ -511,7 +511,7 @@ var addTrustForm,TR_element_count = 0;
 				}
 				b = 'stop';
 			});
-			
+*/
 			//input form 上部のHTMLに対するクリックイベント（初期メッセージ）
 			a("#info-message-input").bind("click",function(){
 				d = 'start';
@@ -549,8 +549,9 @@ var addTrustForm,TR_element_count = 0;
 			a("#message-container-input,#message-container-confirm,#message-container-finish").bind("click",function(){
 				if(!a(this).children("textarea").length) {
 					v = a(this).html();
-					v = v.replace(/<br>/g, "\r\n");
+//					v = v.replace(/<br>/g, "\r\n");
 					a(this).html(a('<textarea>', {cols:40,value:v}));
+					a(this).children('textarea').html(a(this).children('textarea').val());
 					a(this).children('textarea').bind('textchange', function(){
 						a(this).html(a(this).val());
 					});
