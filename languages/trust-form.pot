@@ -465,3 +465,5 @@ msgstr ""
 msgid "%d items duplicated."
 msgstr ""
 
+msgid "Trust Form is in need of your support. Please donate in order to continue development."
+msgstr ""
