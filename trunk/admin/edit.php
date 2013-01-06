@@ -29,4 +29,4 @@ if ( isset( $_GET['action'] ) && 'edit' == $_GET['action'] ) {
 } 
 ?>
 </div>
-
+<?php require_once ( $this->admin_dir. '/paypal.php' ); ?>
