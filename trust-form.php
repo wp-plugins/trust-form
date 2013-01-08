@@ -4,7 +4,7 @@ Plugin Name: Trust Form
 Plugin URI: http://www.kakunin-pl.us/
 Description: Trust Form is a contact form with confirmation screen and mail and data base support.
 Author: horike takahiro
-Version: 1.5.1
+Version: 1.5.2
 Author URI: http://www.kakunin-pl.us/
 
 
@@ -25,32 +25,6 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-register_activation_hook( __FILE__, 'trust_form_install' );
-function trust_form_install() {
-	if ( !get_option('trust_form_install_ver15') ) {
-		$forms = get_posts(array( 'numberposts' => -1, 'post_type' => 'trust-form' ));
-		if ( is_array($forms) ) {
-			foreach ( $forms as $form ) {
-				$res = get_post_meta( $form->ID, 'responce', true );
-				if ( is_array($res) ) {
-					foreach ( $res as $r ) {
-						add_post_meta( $form->ID, 'answer', $r );
-					}
-				}
-				$res = get_post_meta( $form->ID, 'form_admin', true );
-				if ( is_array($res) ) {
-					update_post_meta( $form->ID, 'form_admin_input', $res['input'] );
-					update_post_meta( $form->ID, 'form_admin_confirm', $res['confirm'] );
-					update_post_meta( $form->ID, 'form_admin_finish', $res['finish'] );
-				}
-			//delete_post_meta( $form->ID, 'responce' );
-			//delete_post_meta( $form->ID, 'form_admin' );
-			}
-		}
-		update_option('trust_form_install_ver15', 1);
-	}
-}
-
 
 if ( ! defined( 'TRUST_FORM_DOMAIN' ) )
 	define( 'TRUST_FORM_DOMAIN', 'trust-form' );
@@ -64,7 +38,7 @@ if ( ! defined( 'TRUST_FORM_PLUGIN_DIR' ) )
 new Trust_Form();
 
 class Trust_Form {
-	private $version = '1.5.1';
+	private $version = '1.5.2';
 	private $edit_page;
 	private $entries_page;
 	private $base_dir;
@@ -98,6 +72,7 @@ class Trust_Form {
 		
 		add_action( 'init', array( &$this, 'register_post_type' ) );
 		if ( is_admin() ) {
+			add_action( 'admin_init', array( &$this, 'update' ) );
 			add_action( 'admin_init', array( &$this, 'edit_admin_init' ) );
 			add_action( 'admin_init', array( &$this, 'entries_admin_init' ) );
 			add_action( 'admin_menu', array( &$this, 'admin_menu' ) );
@@ -109,6 +84,36 @@ class Trust_Form {
 		} else {
 			add_action( 'wp_print_styles', array( &$this, 'add_front_styles') );
 		} 
+	}
+	
+	public function update() {
+		if ( version_compare( $this->version, '1.5.2', '<=' ) )
+			$this->trust_form_install_ver15();
+	}
+	
+	private function trust_form_install_ver15() {
+		if ( !get_option('trust_form_install_ver15') ) {
+			$forms = get_posts(array( 'numberposts' => -1, 'post_type' => 'trust-form' ));
+			if ( is_array($forms) ) {
+				foreach ( $forms as $form ) {
+					$res = get_post_meta( $form->ID, 'responce', true );
+					if ( is_array($res) ) {
+						foreach ( $res as $r ) {
+							add_post_meta( $form->ID, 'answer', $r );
+						}
+					}
+					$res = get_post_meta( $form->ID, 'form_admin', true );
+					if ( is_array($res) ) {
+						update_post_meta( $form->ID, 'form_admin_input', $res['input'] );
+						update_post_meta( $form->ID, 'form_admin_confirm', $res['confirm'] );
+						update_post_meta( $form->ID, 'form_admin_finish', $res['finish'] );
+					}
+				//delete_post_meta( $form->ID, 'responce' );
+				//delete_post_meta( $form->ID, 'form_admin' );
+				}
+			}
+			update_option('trust_form_install_ver15', 1);
+		}
 	}
 
 	/* ==================================================
