@@ -3,7 +3,7 @@ Contributors: horike
 Tags:  form, contact form, contact
 Requires at least: 3.3
 Tested up to: 3.5
-Stable tag: 1.5.2
+Stable tag: 1.5.3
 
 Trust Form is a contact form with confirmation screen and mail and data base support.
 
@@ -73,3 +73,5 @@ Please contact to me.
 * Add payola link.
 = 1.5.2 =
 * register active hook does not fired to when update.. fixed.
+= 1.5.3 =
+* Created a bulk action for posts.
