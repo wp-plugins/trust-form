@@ -417,11 +417,13 @@ msgstr ""
 
 #: line 19
 msgid "Item moved to the New."
-msgstr ""
+msgid_plural "%s items moved to the New."
+msgstr[0] ""
 
 #: line 22
 msgid "Item moved to the Read."
-msgstr ""
+msgid_plural "%s items moved to the Read."
+msgstr[0] ""
 
 msgid "CSV Download"
 msgstr ""
@@ -465,5 +467,5 @@ msgstr ""
 msgid "%d items duplicated."
 msgstr ""
 
-msgid "Trust Form is in need of your support. Please donate in order to continue development."
+msgid "Trust Form is in need of your support. You will be able to better this plug-in your donation."
 msgstr ""
