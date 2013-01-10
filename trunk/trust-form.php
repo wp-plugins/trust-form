@@ -379,7 +379,12 @@ class Trust_Form {
 			$sendback = add_query_arg( 'paged', $pagenum, $sendback );
 
 			if ( 'delete_all' == $doaction ) {
-				$entry_ids = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_type=%s AND post_status = %s", 'trust-form', 'trash' ) );
+				$answers = get_post_meta( $form, 'answer' );
+				$entry_ids = array();
+				foreach ( $answers as $id => $answer ) {
+					if ( $answer['trash'] == 'true' )
+						$entry_ids[] = $id;
+				}
 				$doaction = 'delete';
 			} elseif ( isset( $_REQUEST['ids'] ) ) {
 				$entry_ids = explode( ',', $_REQUEST['ids'] );
@@ -1304,11 +1309,48 @@ class Trust_Form_Entries_List_Table extends WP_List_Table {
 	 * @since	1.0
 	 */
 	function get_bulk_actions() {
-		$actions = array(
-			'read'  => __( 'Move to Read', TRUST_FORM_DOMAIN ),
-			'trash'   => __( 'Move to Trash', TRUST_FORM_DOMAIN )
-		);
+		
+		if ( $this->status == 'trash' ) {
+			$actions = array(
+				'untrash' => __( 'Restore', TRUST_FORM_DOMAIN ),
+				'delete'  => __( 'Delete Permanently', TRUST_FORM_DOMAIN )
+			);
+		} elseif ( $this->status == 'new' ) {
+			$actions = array(
+				'read'  => __( 'Move to Read', TRUST_FORM_DOMAIN ),
+				'trash'   => __( 'Move to Trash', TRUST_FORM_DOMAIN )
+			);
+		} elseif ( $this->status == 'read' ) {
+			$actions = array(
+				'new'  => __( 'Move to New', TRUST_FORM_DOMAIN ),
+				'trash'   => __( 'Move to Trash', TRUST_FORM_DOMAIN )
+			);
+		} else {
+			$actions = array(
+				'new'  => __( 'Move to New', TRUST_FORM_DOMAIN ),
+				'read'  => __( 'Move to Read', TRUST_FORM_DOMAIN ),
+				'trash'   => __( 'Move to Trash', TRUST_FORM_DOMAIN )
+			);
+		}
 		return $actions;
+	}
+
+	/* ==================================================
+	 * extra tablenav
+	 * @param	none
+	 * @return	void
+	 * @since	1.0
+	 */	
+	function extra_tablenav( $which ) {
+?>
+		<div class="alignleft actions">
+<?php
+		if ( $this->status === 'trash' ) {
+			submit_button( __( 'Empty Trash' ), 'button-secondary apply', 'delete_all', false );
+		}
+?>
+		</div>
+<?php
 	}
 
 	/* ==================================================
