@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Trust Forms\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-09-19 22:01+0900\n"
-"PO-Revision-Date: 2013-01-10 16:49+0900\n"
+"PO-Revision-Date: 2013-02-05 16:30+0900\n"
 "Last-Translator: horike <horike@digitalcube.jp>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -32,7 +32,7 @@ msgstr "フォームの新規作成"
 
 #: line 307
 msgid "Entries"
-msgstr "投稿"
+msgstr "お問い合わせ内容"
 
 #: line 899,1274
 msgid "All"
@@ -481,6 +481,9 @@ msgstr "複製しました"
 msgid "%d items duplicated."
 msgstr "%d個の項目を複製しました"
 
-msgid "Trust Form is in need of your support. You will be able to better this plug-in your donation."
-msgstr "Trust Formはあなたのサポートを必要としています。あなた寄付でこのプラグインはもっと良くなることができます。"
-
+msgid ""
+"Trust Form is in need of your support. You will be able to better this plug-"
+"in your donation."
+msgstr ""
+"Trust Formはあなたのサポートを必要としています。あなた寄付でこのプラグインは"
+"もっと良くなることができます。"

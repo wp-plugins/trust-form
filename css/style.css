@@ -266,6 +266,10 @@ table#standard-form-element-list td ul {
 	border: 2px dotted #C0C0C0;
 }
 
+#advanced-sortables {
+	min-height:280px;
+}
+
 /*----------- entry.php ------------------*/
 #entry-contaier {
 	margin-top: 20px;
