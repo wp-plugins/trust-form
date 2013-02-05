@@ -19,7 +19,7 @@ $form_config = !isset( $_GET['action'] ) || 'edit' != $_GET['action'] ? '' : get
 <div id="element-container" class="postbox-container" style="width:25%;">
 <?php
 add_meta_box( 'standard-form', __( 'Standard Field', TRUST_FORM_DOMAIN ), 'trustform_standard_form_meta_box', 'trustform', 'advanced', 'core' );
-add_meta_box( 'advanced-form', __( 'Advanced Field', TRUST_FORM_DOMAIN ), 'trustform_advanced_form_meta_box', 'trustform', 'advanced', 'core' );
+//add_meta_box( 'advanced-form', __( 'Advanced Field', TRUST_FORM_DOMAIN ), 'trustform_advanced_form_meta_box', 'trustform', 'advanced', 'core' );
 
 do_meta_boxes( 'trustform', 'advanced', $this );
 wp_nonce_field( 'meta-box-order', 'meta-box-order-nonce', false );
