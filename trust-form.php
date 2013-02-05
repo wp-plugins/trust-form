@@ -4,7 +4,7 @@ Plugin Name: Trust Form
 Plugin URI: http://www.kakunin-pl.us/
 Description: Trust Form is a contact form with confirmation screen and mail and data base support.
 Author: horike takahiro
-Version: 1.5.5
+Version: 1.5.6
 Author URI: http://www.kakunin-pl.us/
 
 
@@ -38,7 +38,7 @@ if ( ! defined( 'TRUST_FORM_PLUGIN_DIR' ) )
 new Trust_Form();
 
 class Trust_Form {
-	private $version = '1.5.5';
+	private $version = '1.5.6';
 	private $edit_page;
 	private $entries_page;
 	private $base_dir;
@@ -216,7 +216,9 @@ class Trust_Form {
 									'attr' => get_post_meta( $form_id, 'attr' ),
 									'admin_mail' => get_post_meta( $form_id, 'admin_mail' ),
 									'user_mail' => get_post_meta( $form_id, 'user_mail' ),
-									'form_admin' => get_post_meta( $form_id, 'form_admin' ),
+									'form_admin_input' => get_post_meta( $form_id, 'form_admin_input' ),
+									'form_admin_confirm' => get_post_meta( $form_id, 'form_admin_confirm' ),
+									'form_admin_finish' => get_post_meta( $form_id, 'form_admin_finish' ),
 									'form_front' => get_post_meta( $form_id, 'form_front' ),
 									'config' => get_post_meta( $form_id, 'config' )
 								);
@@ -227,7 +229,9 @@ class Trust_Form {
 						update_post_meta( $new_id, 'attr', $data['attr'][0] );
 						update_post_meta( $new_id, 'admin_mail', $data['admin_mail'][0] );
 						update_post_meta( $new_id, 'user_mail', $data['user_mail'][0] );
-						update_post_meta( $new_id, 'form_admin', $data['form_admin'][0] );
+						update_post_meta( $new_id, 'form_admin_input', $data['form_admin_input'][0] );
+						update_post_meta( $new_id, 'form_admin_confirm', $data['form_admin_confirm'][0] );
+						update_post_meta( $new_id, 'form_admin_finish', $data['form_admin_finish'][0] );
 						update_post_meta( $new_id, 'form_front', $data['form_front'][0] );
 						update_post_meta( $new_id, 'config', $data['config'][0] );
 
@@ -604,6 +608,7 @@ class Trust_Form {
 				wp_enqueue_script( 'jquery-textchange', $this->plugin_url . '/js/jquery.textchange.js', array( 'jquery' ) );
 				wp_enqueue_script( 'jquery-outerclick', $this->plugin_url . '/js/jquery.outerclick.js', array( 'jquery' ) );
 				wp_enqueue_script( 'jquery-ah-placeholder', $this->plugin_url . '/js/jquery.ah-placeholder.js', array( 'jquery' ) );
+//				wp_enqueue_script( 'jquery-exflexfixed', $this->plugin_url . '/js/jquery.exflexfixed-0.3.0.js', array( 'jquery' ) );
 				wp_enqueue_script( 'add-form', $this->plugin_url . '/js/add-form.js' );
 
 				add_action( 'admin_head', array( &$this, 'post_admin_ajax' ) );
@@ -620,6 +625,7 @@ class Trust_Form {
 					wp_enqueue_script( 'jquery-textchange', $this->plugin_url . '/js/jquery.textchange.js', array( 'jquery' ) );
 					wp_enqueue_script( 'jquery-outerclick', $this->plugin_url . '/js/jquery.outerclick.js', array( 'jquery' ) );
 					wp_enqueue_script( 'jquery-ah-placeholder', $this->plugin_url . '/js/jquery.ah-placeholder.js', array( 'jquery' ) );
+//					wp_enqueue_script( 'jquery-exflexfixed', $this->plugin_url . '/js/jquery.exflexfixed-0.3.0.js', array( 'jquery' ) );
 					wp_enqueue_script( 'add-form', $this->plugin_url . '/js/add-form.js' );
 					
 					$this->form_id = isset( $_GET['form'] )&&is_numeric( $_GET['form'] ) ? $_GET['form'] : -1;
