@@ -310,7 +310,9 @@ function trustform_advanced_form_meta_box() {
 </ul>
 <div id="tab-1">
 <ul id="trust-form-toolbar" class="toolbar">
+<?php if ( defined( 'TRUST_FORM_DEFAULT_STYLE' ) && TRUST_FORM_DEFAULT_STYLE === false ) : ?>
 <li id="menu-css_editor"><?php echo esc_html( __( 'CSS Editor', TRUST_FORM_DOMAIN ) ); ?></li>
+<?php endif; ?>
 <li id="menu-require_mark"><?php echo esc_html( __( 'Require Mark', TRUST_FORM_DOMAIN ) ); ?></li>
 </ul>
 <div class="contact-form contact-form-input">
