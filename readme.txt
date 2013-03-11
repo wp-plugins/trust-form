@@ -2,8 +2,8 @@
 Contributors: horike
 Tags:  form, contact form, contact
 Requires at least: 3.3
-Tested up to: 3.5
-Stable tag: 1.5.7
+Tested up to: 3.5.1
+Stable tag: 1.6.0
 
 Trust Form is a contact form with confirmation screen and mail and data base support.
 
@@ -30,6 +30,7 @@ Please contact to me.
 * [Horike Takahiro](http://twitter.com/horike37)
 * [Seguchi Rie](http://5dg.biz) making the admin screen icon
 * webnist Bug fixes
+* [Aihara Chieko](http://webourgeon.com/) making the default css
 
 == Installation ==
 
@@ -83,3 +84,6 @@ Please contact to me.
 * Fixed a bug for duplicate form.
 = 1.5.7 =
 * Fixed a bug for admin screen.
+= 1.6.0 =
+* Remove the function of CSS EDITOR. But you can restore this function when you write define( 'TRUST_FORM_DEFAULT_STYLE', false ); in wp-config.php,
+* Add default css by making [Aihara Chieko](http://webourgeon.com/)
