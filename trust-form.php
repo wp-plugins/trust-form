@@ -339,7 +339,9 @@ class Trust_Form {
 				}
 			}
 
-			if ( function_exists('mb_convert_variables') ) {
+			if ( defined( 'TRUST_FORM_CSV_SJIS_SUPPORT' ) 
+			&& TRUST_FORM_CSV_SJIS_SUPPORT === true 
+			&& function_exists('mb_convert_variables') ) {
 				mb_convert_variables('SJIS', 'UTF-8', $csv_ti);
 				mb_convert_variables('SJIS', 'UTF-8', $csv);
 			}
@@ -1066,7 +1068,7 @@ jQuery(document).ready(function() {
 }
 
 if ( !class_exists( 'WP_List_Table' ) ) {
-    require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
+    require_once( ABSPATH . '/wp-admin/includes/class-wp-list-table.php' );
 }
 class Trust_Form_Entries_List_Table extends WP_List_Table {
 
@@ -1861,6 +1863,8 @@ class Trust_Form_Front {
 	private $user_mail = '';
 	private $config = '';
 	private $err_msg = array();
+	private $wp_mail_from = '';
+	private $wp_mail_from_name = '';
 
 	public function __construct($id){
 		$this->id = $id;
@@ -1970,100 +1974,7 @@ class Trust_Form_Front {
 			return $response[1] == 'true' ? true : false;
 		}
 	}
-	/* ==================================================
-	 * Show input screen for display
-	 * @param	none
-	 * @return	String
-	 * @since	1.0
-	 */
-/*	public function show_input() {
-		$nonce = wp_nonce_field('trust_form','trust_form_input_nonce_field');
-		$html = <<<EOT
-<div id="trust-form" class="contact-form" >
-<p id="message-container-input">{$this->form[0]['input_top']}</p>
-<form action="#trust-form" method="post" >
-<table>
-<tbody>
-EOT;
-		foreach ( $this->name[0] as $key => $name ) {
-			$html .= '<tr><th scope="row"><div class="subject"><span class="content">'.$name.'</span>'.(isset($this->validate[0][$key]['required']) && $this->validate[0][$key]['required'] == 'true' ? '<span class="require">'.$this->config[0]['require'].'</span>' : '' ).'</div><div class="submessage">'.$this->attention[0][$key].'</div></th><td><div>'.$this->_get_element( $key ).'</div>';
 
-			if ( isset($this->err_msg[$key]) && is_array($this->err_msg[$key]) ) {
-				$html .= '<div class="error">';
-				foreach ( $this->err_msg[$key] as $msg ) {
-					$html .= $msg.'<br />';
-				}
-				$html .= '</div>';
-			}
-			$html .= '</td></tr>';
-		}
-		$html .= <<<EOT
-</tbody>
-</table>
-<input type="hidden" name="mode" value="confirm" />
-{$nonce}
-<p id="confirm-button" class="submit-container">{$this->form[0]['input_bottom']}</p>
-</form>
-</div>
-EOT;
-
-		return $html;
-	}
-*/
-	/* ==================================================
-	 * Show confirm screen for display
-	 * @param	none
-	 * @return	String
-	 * @since	1.0
-	 */
-/*	public function show_confirm() {
-		if ( empty($_POST) || !wp_verify_nonce($_POST['trust_form_input_nonce_field'],'trust_form') )
-			return $this->show_input();
-
-		$nonce = wp_nonce_field('trust_form','trust_form_confirm_nonce_field');
-		$html = <<<EOT
-<div id="trust-form" class="contact-form" >
-<p id="message-container-confirm">{$this->form[0]['confirm_top']}</p>
-<form action="#trust-form" method="post" >
-<table>
-<tbody>
-EOT;
-		foreach ( $this->name[0] as $key => $name ) {
-			$html .= '<tr><th><div class="subject">'.$name.'</div></th><td><div>'.$this->_get_input_data($key).'</div>';
-			
-			$html .= '</td></tr>';
-		}
-		$html .= <<<EOT
-</tbody>
-</table>
-<input type="hidden" name="mode" value="finish" />
-{$nonce}
-<p id="confirm-button" class="submit-container">{$this->form[0]['confirm_bottom']}</p>
-</form>
-</div>
-EOT;
-		return $html;
-	}
-*/
-	/* ==================================================
-	 * Show finish screen for display
-	 * @param	none
-	 * @return	String
-	 * @since	1.0
-	 */
-/*	public function show_finish() {
-		if ( empty($_POST) || !wp_verify_nonce($_POST['trust_form_confirm_nonce_field'],'trust_form') )
-			return $this->show_input();
-		
-		$this->_save();
-		$html = <<<EOT
-<div id="trust-form" class="contact-form" >
-<p id="message-container-confirm">{$this->form[0]['finish']}</p>
-</div>
-EOT;
-		return $html;
-	}
-*/
 	/* ==================================================
 	 * Get an input element
 	 * @param	none
@@ -2184,12 +2095,8 @@ EOT;
 		$new_responce["status"] = 'new';
 		$new_responce["trash"] = 'false';
 		$new_responce["note"] = array();
-//		$responce[0][0] = '';
 		$new_responce = apply_filters( 'tr_new_responce', $new_responce, $this->type[0], $this->id );
-//		$responce[0][] = $new_responce;
-//		unset($responce[0][0]);
-		
-//		$responce[0] = apply_filters( 'tr_save_posts', $responce[0] );
+
 		$prev_responce = get_post_meta( $this->id, 'answer' );
 		foreach ( $prev_responce as $r ) {
 			if ( $r == $new_responce )
@@ -2202,30 +2109,60 @@ EOT;
 		if ( $this->user_mail[0]['user_mail_y'] === '1' ) {
 			foreach( $this->name[0] as $key => $name ) {
 				if (  $this->type[0][$key] =='e-mail' ) {
-					add_filter( 'wp_mail_from', array(&$this, 'wp_user_mail_from'));
-					add_filter( 'wp_mail_from_name',  array(&$this, 'wp_user_mail_from_name') );
+					add_filter( 'wp_mail_from', array(&$this, 'wp_user_mail_from'), 50 );
+					add_filter( 'wp_mail_from_name',  array(&$this, 'wp_user_mail_from_name'), 50 );
 					if ( isset($_POST[$key]) )
 						$this->_send_user_mail( $this->id, $new_responce, $_POST[$key] );
 				}
 			}
 		}
-		if ( has_filter( 'wp_mail_from', array(&$this, 'wp_user_mail_from') ) )
-			remove_filter( 'wp_mail_from', array(&$this, 'wp_user_mail_from') );
 
-		if ( has_filter( 'wp_mail_from_name', array(&$this, 'wp_user_mail_from_name') ) )
-			remove_filter( 'wp_mail_from_name', array(&$this, 'wp_user_mail_from_name') );
+		add_filter( 'wp_mail_from', array(&$this, 'wp_mail_from'), 100);
+		add_filter( 'wp_mail_from_name',  array(&$this, 'wp_mail_from_name'), 100 );
 
-		add_filter( 'wp_mail_from', array(&$this, 'wp_mail_from'));
-		add_filter( 'wp_mail_from_name',  array(&$this, 'wp_mail_from_name') );
+		if ( $this->_has_shortcode($this->admin_mail[0]['from']) ) {
+			$mail = str_replace( '[', '', $this->admin_mail[0]['from'] );
+			$mail = str_replace( ']', '', $mail );
+			foreach( $this->name[0] as $key => $name ) {
+				if ( $mail == $name ) {
+					if ( isset($_POST[$key]) ) {
+						$this->wp_mail_from = $_POST[$key];
+						add_filter( 'wp_mail_from', array(&$this, 'wp_mail_from_advanced'), 150 );
+					}
+				}
+			}
+		}
+		if ( $this->_has_shortcode($this->admin_mail[0]['from_name']) ) {
+			$mail = str_replace( '[', '', $this->admin_mail[0]['from_name'] );
+			$mail = str_replace( ']', '', $mail );
+			foreach( $this->name[0] as $key => $name ) {
+				if ( $mail == $name ) {
+					if ( isset($_POST[$key]) ) {
+						$this->wp_mail_from_name = $_POST[$key];
+						add_filter( 'wp_mail_from_name', array(&$this, 'wp_mail_from_name_advanced'), 150 );
+					}
+				}
+			}
+		}
 		$this->_send_admin_mail( $this->id, $new_responce );
 
-		if ( has_filter( 'wp_mail_from', array(&$this, 'wp_mail_from') ) )
-			remove_filter( 'wp_mail_from', array(&$this, 'wp_mail_from') );
-
-		if ( has_filter( 'wp_mail_from_name', array(&$this, 'wp_mail_from_name') ) )
-			remove_filter( 'wp_mail_from_name', array(&$this, 'wp_mail_from_name') );
 	}
-
+	
+	/* ==================================================
+	 * check shortcode 
+	 * @param	none
+	 * @return	void
+	 * @since	1.01
+	 */
+	private function _has_shortcode($shortcode) {
+		$pattern = '/\[.*\]/im';
+		if ( preg_match($pattern, $shortcode) ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	 
 	/* ==================================================
 	 * Send auto reply mail
 	 * @param	none
@@ -2247,7 +2184,12 @@ EOT;
 		foreach ( $data['data'] as $key => $res ) {
 			$body = str_replace( '['.$key.']', $res, $body );
 		}
-		
+
+		foreach ( $this->name[0] as $key => $name ) {
+			if ( preg_match('/['.$name.']/i', $body) )
+				$body = str_replace( '['.$name.']', $data['data'][$key], $body );
+		}
+
 		$body = apply_filters( 'tr_pre_auto_reply_mail_body', $body, $data['data'], $id );
 		
 		wp_mail( $to, $this->user_mail[0]['subject2'], $body );
@@ -2263,7 +2205,7 @@ EOT;
 		$data['data'] = apply_filters( 'tr_pre_admin_mail', $data['data'], $id );
 		$body = '';
 		if ( !defined( 'TRUST_FORM_DB_SUPPORT' ) || TRUST_FORM_DB_SUPPORT !== false ) {
-			$body .= site_url( '/wp-admin/admin.php?page=trust-form-entries&form='.$id.'&status=new' );
+			$body .= admin_url( '?page=trust-form-entries&form='.$id.'&status=new' );
 			$body .= "\n\n";
 		}
 		foreach ( $data['data'] as $key => $res ) {
@@ -2287,7 +2229,15 @@ EOT;
 	}
 
 	public function wp_mail_from_name( $mail_from_name ) {
-		return wp_specialchars_decode($this->admin_mail[0]['from_name'], ENT_QUOTES);;
+		return wp_specialchars_decode($this->admin_mail[0]['from_name'], ENT_QUOTES);
+	}
+	
+	public function wp_mail_from_advanced( $mail_from ) {
+		return $this->wp_mail_from;
+	}
+
+	public function wp_mail_from_name_advanced( $mail_from_name ) {
+		return wp_specialchars_decode($this->wp_mail_from_name, ENT_QUOTES);
 	}
 
 	public function wp_user_mail_from( $mail_from ) {
@@ -2295,7 +2245,7 @@ EOT;
 	}
 
 	public function wp_user_mail_from_name( $mail_from_name ) {
-		return wp_specialchars_decode($this->user_mail[0]['from_name2'], ENT_QUOTES);;
+		return wp_specialchars_decode($this->user_mail[0]['from_name2'], ENT_QUOTES);
 	}
 
 	/* ==================================================
