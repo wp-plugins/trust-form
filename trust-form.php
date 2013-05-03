@@ -4,7 +4,7 @@ Plugin Name: Trust Form
 Plugin URI: http://www.kakunin-pl.us/
 Description: Trust Form is a contact form with confirmation screen and mail and data base support.
 Author: horike takahiro
-Version: 1.6.0
+Version: 1.7.0
 Author URI: http://www.kakunin-pl.us/
 
 
@@ -38,7 +38,7 @@ if ( ! defined( 'TRUST_FORM_PLUGIN_DIR' ) )
 new Trust_Form();
 
 class Trust_Form {
-	private $version = '1.6.0';
+	private $version = '1.7.0';
 	private $edit_page;
 	private $entries_page;
 	private $base_dir;
@@ -769,6 +769,7 @@ jQuery(document).ready(function() {
 			param['attention'][name] = jQuery(this).children('th.setting-element-title').children('div.submessage').children('span.content').html();
 			param['type'][name] = jQuery(this).attr('title');
 			param['validation'][name] = validation;
+
 			//各属性値の取得
 			if ( jQuery(this).attr('title') == 'selectbox' ) {
 				param['attr']['value'][name] = [];
@@ -2190,9 +2191,15 @@ class Trust_Form_Front {
 				$body = str_replace( '['.$name.']', $data['data'][$key], $body );
 		}
 
+		$subject = $this->user_mail[0]['subject2'];
+		foreach ( $this->name[0] as $key => $name ) {
+			if ( preg_match('/['.$name.']/i', $subject) )
+				$subject = str_replace( '['.$name.']', $data['data'][$key], $subject );
+		}
+		$subject = apply_filters( 'tr_pre_auto_reply_mail_subject', $subject, $data['data'], $id );
 		$body = apply_filters( 'tr_pre_auto_reply_mail_body', $body, $data['data'], $id );
 		
-		wp_mail( $to, $this->user_mail[0]['subject2'], $body );
+		wp_mail( $to, $subject, $body );
 	}
 
 	/* ==================================================
@@ -2216,7 +2223,14 @@ class Trust_Form_Front {
 			}
 		}
 		$body = apply_filters( 'tr_pre_send_mail', $body, $data['data'], $id );
-		$subject = apply_filters( 'tr_subject_admin_mail', $this->admin_mail[0]['subject'], $data['data'], $id );
+
+		$subject = $this->admin_mail[0]['subject'];
+		foreach ( $this->name[0] as $key => $name ) {
+			if ( preg_match('/['.$name.']/i', $subject) )
+				$subject = str_replace( '['.$name.']', $data['data'][$key], $subject );
+		}
+
+		$subject = apply_filters( 'tr_subject_admin_mail', $subject, $data['data'], $id );
 
 		$headers = '';
 		$headers .= $this->admin_mail[0]['cc'] != '' ? 'cc:' . $this->admin_mail[0]['cc'] . "\n" : '' ;
