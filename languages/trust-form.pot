@@ -267,7 +267,7 @@ msgid "cols"
 msgstr ""
 
 #: line 121,130,153,162
-msgid "option value"
+msgid "Select"
 msgstr ""
 
 #: line 185,193

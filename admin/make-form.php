@@ -180,7 +180,7 @@ function trustform_standard_form_meta_box() {
     <th scope="row" class="setting-element-title" style="visibility: hidden;"><div class="subject"><span class="content">title</span><span class="require"></span></div><div class="submessage"><span class="content"></span></div></th>
     <td class="setting-element-discription" style="visibility: hidden;">
       <ul>
-        <li><input type="radio" /><?php echo esc_html(  __( 'option value', TRUST_FORM_DOMAIN ) );?></li>
+        <li><input type="radio" /><?php echo esc_html(  __( 'Select', TRUST_FORM_DOMAIN ) );?></li>
       </ul>
     </td>
     <td class="setting-element-editor" style="display:none">
@@ -189,7 +189,7 @@ function trustform_standard_form_meta_box() {
         <img class="edit-menu-icon text-delete delete-button" src="images/no.png">
         <div class="text-edit-content display-out">
           <div class="edit-content-title"><span><strong><?php echo esc_html(  __( 'Radio', TRUST_FORM_DOMAIN )); ?></strong></span><img class="del-icon" src="<?php echo TRUST_FORM_PLUGIN_URL.'/images/del.gif'; ?>"></div>
-          <div class="text-edit-content-title"><strong><?php echo esc_html(  __( 'option value', TRUST_FORM_DOMAIN ) ); ?></strong></div>           
+          <div class="text-edit-content-title"><strong><?php echo esc_html(  __( 'Select', TRUST_FORM_DOMAIN ) ); ?></strong></div>           
           <hr class="text-edit-conten-spencer" />
           <textarea class="option-value-editor" role="radio" cols="35" rows="5" ></textarea>
           <div class="text-edit-content-title"><strong><?php echo esc_html(  __( 'validation', TRUST_FORM_DOMAIN ) ); ?></strong></div>
