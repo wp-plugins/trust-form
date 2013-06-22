@@ -4,7 +4,7 @@ Plugin Name: Trust Form
 Plugin URI: http://www.kakunin-pl.us/
 Description: Trust Form is a contact form with confirmation screen and mail and data base support.
 Author: horike takahiro
-Version: 1.7.0
+Version: 1.7.1
 Author URI: http://www.kakunin-pl.us/
 
 
@@ -24,7 +24,6 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-
 
 if ( ! defined( 'TRUST_FORM_DOMAIN' ) )
 	define( 'TRUST_FORM_DOMAIN', 'trust-form' );
@@ -2597,4 +2596,23 @@ $Trust_Form_Validator_Message = array(
 //	const SIGNUMBER        = 'は半角数字または半角記号で入力してください';
 //	const HANKAKU2         = 'は半角英数字または半角記号で入力してください';
 );
+
+add_action( 'the_content', 'trust_form_change_validate_message' );
+function trust_form_change_validate_message( $content ) {
+	global $Trust_Form_Validator_Message;
+	$Trust_Form_Validator_Message['required'] = apply_filters( 'tr_validate_message_required', $Trust_Form_Validator_Message['required'] );
+	$Trust_Form_Validator_Message['e-mail'] = apply_filters( 'tr_validate_message_mail', $Trust_Form_Validator_Message['e-mail'] );
+	$Trust_Form_Validator_Message['hiragana'] = apply_filters( 'tr_validate_message_hiragana', $Trust_Form_Validator_Message['hiragana'] );
+	$Trust_Form_Validator_Message['minlength'] = apply_filters( 'tr_validate_message_minlength', $Trust_Form_Validator_Message['minlength'] );
+	$Trust_Form_Validator_Message['maxlength'] = apply_filters( 'tr_validate_message_maxlength', $Trust_Form_Validator_Message['maxlength'] );
+	$Trust_Form_Validator_Message['bothlength'] = apply_filters( 'tr_validate_message_bothlength', $Trust_Form_Validator_Message['bothlength'] );
+	$Trust_Form_Validator_Message['zenkaku'] = apply_filters( 'tr_validate_message_zenkaku', $Trust_Form_Validator_Message['zenkaku'] );
+	$Trust_Form_Validator_Message['eiji'] = apply_filters( 'tr_validate_message_eiji', $Trust_Form_Validator_Message['eiji'] );
+	$Trust_Form_Validator_Message['number'] = apply_filters( 'tr_validate_message_number', $Trust_Form_Validator_Message['number'] );
+	$Trust_Form_Validator_Message['katakana'] = apply_filters( 'tr_validate_message_katakana', $Trust_Form_Validator_Message['katakana'] );
+	$Trust_Form_Validator_Message['hankaku'] = apply_filters( 'tr_validate_message_hankaku', $Trust_Form_Validator_Message['hankaku'] );
+	$Trust_Form_Validator_Message['hankaku2'] = apply_filters( 'tr_validate_message_hankaku2', $Trust_Form_Validator_Message['hankaku2'] );
+	
+	return $content;
+}
 ?>
