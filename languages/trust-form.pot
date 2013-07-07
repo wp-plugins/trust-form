@@ -469,3 +469,9 @@ msgstr ""
 
 msgid "Trust Form is in need of your support. You will be able to better this plug-in your donation."
 msgstr ""
+
+msgid "Other Setting"
+msgstr ""
+
+msgid "The e-mail mismatch"
+msgstr ""

@@ -28,6 +28,7 @@ foreach ( $responce[$entry]['title'] as $key => $e ){
 <tr><th scope="row"><?php echo esc_html($e); ?></th><td><?php echo str_replace( "\n", '<br />', esc_html($responce[$entry]['data'][$key])); ?></td></tr>
 <?php
 }
+do_action( 'tr_entry_action', $responce[$entry], $form, $entry );
 $notes = $responce[$entry]['note'];
 ?>
 </table>

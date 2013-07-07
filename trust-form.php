@@ -219,7 +219,8 @@ class Trust_Form {
 									'form_admin_confirm' => get_post_meta( $form_id, 'form_admin_confirm' ),
 									'form_admin_finish' => get_post_meta( $form_id, 'form_admin_finish' ),
 									'form_front' => get_post_meta( $form_id, 'form_front' ),
-									'config' => get_post_meta( $form_id, 'config' )
+									'config' => get_post_meta( $form_id, 'config' ),
+									'other_setting' => get_post_meta( $form_id, 'other_setting' )
 								);
 						update_post_meta( $new_id, 'name', $data['name'][0] );
 						update_post_meta( $new_id, 'attention', $data['attention'][0] );
@@ -233,6 +234,7 @@ class Trust_Form {
 						update_post_meta( $new_id, 'form_admin_finish', $data['form_admin_finish'][0] );
 						update_post_meta( $new_id, 'form_front', $data['form_front'][0] );
 						update_post_meta( $new_id, 'config', $data['config'][0] );
+						update_post_meta( $new_id, 'other_setting', $data['other_setting'][0] );
 
 						@copy( $this->plugin_dir . '/css/front.css', $this->plugin_dir . '/css/front_'.$new_id.'.css' );
 
@@ -700,12 +702,14 @@ jQuery(document).ready(function() {
 				      cols:{},
 				      rows:{},
 				      class:{},
-				      akismet:{}},
+				      akismet:{},
+				      e_mail_confirm:{}},
 				admin_mail:{},
 				user_mail:{},
 				form_admin:{},
 				form_front:{element:{}},
-				config:{}
+				config:{},
+				other_setting:{}
 				};
 		if (!jQuery('#setting-form tbody tr').not('#first-setting-info').length) {
 			return false;
@@ -759,6 +763,7 @@ jQuery(document).ready(function() {
 			//emailのバリデーション
 			if (jQuery(this).hasClass('e-mail-container')) {
 				validation['required'] = jQuery(this).find('input[name=e-mail-required]').is(':checked') ? 'true' : '';
+				validation['e_mail_confirm'] = jQuery(this).find('.edit-element-container input[name=email-confirm-title]').val();
 			}
 			name = jQuery(this).children('.setting-element-discription').find('input,select,textarea').prop('name');
 			name = name.replace('[]', '');
@@ -798,7 +803,6 @@ jQuery(document).ready(function() {
 				param['attr']['size'][name] = jQuery(this).find('.setting-element-discription > input').attr('size') ? jQuery(this).find('.setting-element-discription > input').attr('size') : '';
 				param['attr']['maxlength'][name] = jQuery(this).find('.setting-element-discription > input').attr('maxlength') ? jQuery(this).find-('.setting-element-discription > input').attr('maxlength') : '';
 				param['attr']['class'][name] = jQuery(this).find('.setting-element-discription > input').attr('class') ? jQuery(this).find('.setting-element-discription > input').attr('class') : '' ;
-
 			}
 			param['attr']['akismet'][name] = jQuery(this).find('.edit-element-container input[name=akismet-config]:checked').val();
 			param['form_front']['element'][name] = jQuery(this).children('td.setting-element-discription').html();
@@ -842,6 +846,7 @@ jQuery(document).ready(function() {
 		if (jQuery('#require-mark-text').val() != '') {
 			param['config']['require'] = jQuery('#require-mark-content > span').html();
 		}
+		param['other_setting'] = jQuery('#trust-form-other-setting').val();
 
 		//コールバック
 		jQuery.post(ajaxurl, param, function(id) {
@@ -972,7 +977,8 @@ jQuery(document).ready(function() {
 			if (array_key_exists('form_admin', $_POST)) {update_post_meta( $post_id, 'form_admin_confirm', $_POST['form_admin']['confirm'] );}
 			if (array_key_exists('form_admin', $_POST)) {update_post_meta( $post_id, 'form_admin_finish', $_POST['form_admin']['finish'] );}
 			if (array_key_exists('form_front', $_POST)) {update_post_meta( $post_id, 'form_front', $_POST['form_front'] );}
-			if (array_key_exists('config', $_POST)) {update_post_meta( $post_id, 'config', $_POST['config'] );}	
+			if (array_key_exists('config', $_POST)) {update_post_meta( $post_id, 'config', $_POST['config'] );}
+			if (array_key_exists('other_setting', $_POST)) {update_post_meta( $post_id, 'other_setting', $_POST['other_setting'] );}
 		}
 		echo esc_html( $post_id );
 		die();
@@ -2090,8 +2096,17 @@ class Trust_Form_Front {
 					break;
 			}
 			$new_responce['title'][$key] = $name;
+			
+			foreach ( $this->validate[0] as $validate ) {
+				if ( array_key_exists('e_mail_confirm', $validate) && in_array($name, $validate) ) {
+					unset($new_responce['title'][$key]);
+					unset($new_responce['data'][$key]);
+				}
+			}
 		}
+		
 		$new_responce['data']["date"] = date_i18n('Y/m/d H:i:s');
+		
 		$new_responce["status"] = 'new';
 		$new_responce["trash"] = 'false';
 		$new_responce["note"] = array();
@@ -2176,7 +2191,9 @@ class Trust_Form_Front {
 			if ( $key == 'date' ) {
 				$body .= __( 'Date', TRUST_FORM_DOMAIN ).': '.$res."\n\n";
 			} else {
-				$body .= $data['title'][$key].': '.$res."\n\n";
+				if ( isset($data['title'][$key]) ) {
+					$body .= $data['title'][$key].': '.$res."\n\n";
+				}
 			}
 		}
 		$body = str_replace( '[FORM DATA]', $body, $this->user_mail[0]['message2'] );
@@ -2218,7 +2235,9 @@ class Trust_Form_Front {
 			if ( $key == 'date' ) {
 				$body .= apply_filters( 'tr_pre_date_admin_mail', __( 'Date', TRUST_FORM_DOMAIN ).': '.$res."\n\n", $id );
 			} else {
-				$body .= apply_filters( 'tr_pre_title_admin_mail', $data['title'][$key].': '.$res."\n\n", $id );
+				if ( isset($data['title'][$key]) ) {
+					$body .= apply_filters( 'tr_pre_title_admin_mail', $data['title'][$key].': '.$res."\n\n", $id );
+				}
 			}
 		}
 		$body = apply_filters( 'tr_pre_send_mail', $body, $data['data'], $id );
@@ -2348,6 +2367,15 @@ class Trust_Form_Front {
 						$this->err_msg[$key][] = $Trust_Form_Validator_Message['required'];
 					if ( $_POST[$key] != "" && !is_email($_POST[$key]) )
 						$this->err_msg[$key][] = $Trust_Form_Validator_Message['e-mail'];
+					if ( isset( $_POST['send-to-confirm'] ) && isset($this->validate[0][$key]['e_mail_confirm']) && $this->validate[0][$key]['e_mail_confirm'] != '' ) {
+						foreach ( $this->name[0] as $key_1 => $name_1 ) {
+							if ( $this->validate[0][$key]['e_mail_confirm'] == $name_1 ) {
+								if ( $_POST[$key] != $_POST[$key_1] )
+									$this->err_msg[$key][] = $Trust_Form_Validator_Message['e_mail_confirm'];
+							}
+						}
+					}
+						
 			}
 		}
 		if ( empty($this->err_msg) ) {
@@ -2577,6 +2605,7 @@ $Trust_Form_Validator_Message = array(
 	'hankaku'    => __("Please enter by using English or number", TRUST_FORM_DOMAIN),
 	'hankaku2'   => __("Please enter by using English or number or code", TRUST_FORM_DOMAIN),
 	'e-mail'     => __("The format of the e-mail address is invalid", TRUST_FORM_DOMAIN),
+	'e_mail_confirm' => __("The e-mail mismatch", TRUST_FORM_DOMAIN)
 //	const REQUIRED_SELECT  = 'が選択されていません';
 //	const MAXLENGTH        = 'は__maxlength__文字以下で入力してください';
 //	const MINLENGTH        = 'は__minlength__文字以上で入力してください';
@@ -2612,7 +2641,65 @@ function trust_form_change_validate_message( $content ) {
 	$Trust_Form_Validator_Message['katakana'] = apply_filters( 'tr_validate_message_katakana', $Trust_Form_Validator_Message['katakana'] );
 	$Trust_Form_Validator_Message['hankaku'] = apply_filters( 'tr_validate_message_hankaku', $Trust_Form_Validator_Message['hankaku'] );
 	$Trust_Form_Validator_Message['hankaku2'] = apply_filters( 'tr_validate_message_hankaku2', $Trust_Form_Validator_Message['hankaku2'] );
+	$Trust_Form_Validator_Message['e_mail_confirm'] = apply_filters( 'tr_validate_message_e_mail_confirm', $Trust_Form_Validator_Message['e_mail_confirm'] );
 	
 	return $content;
 }
+
+class Trust_Form_Other_Setting {
+
+	public function __construct() {
+		add_filter( 'tr_new_responce', array( $this, 'add_responce' ), 20, 3 );
+		add_action( 'tr_entry_action', array( $this, 'entry_action' ), 20, 3 );
+		add_filter( 'tr_pre_send_mail', array( $this, 'admin_mail' ), 20, 3 );
+	}
+
+	private function _unserialized($data) {
+		if ( $data == '' )
+			return false;
+
+		$data = explode("\n", $data);
+		$data = array_map('trim', $data);
+		$data = array_filter($data, 'strlen');
+		$data = array_values($data);
+	
+		return $data;
+	}
+	
+	public function admin_mail( $body, $data, $id ) {
+		$other_setting = $this->_unserialized(get_post_meta( $id, 'other_setting', true ));
+		
+		foreach ( $other_setting as $setting ) {
+			$setting = explode(':', $setting);
+			if ( $setting[0] == 'server' && isset($data[$setting[1]]) ) {
+				$body .= $setting[1] .': '. $data[$setting[1]] . "\n\n";
+			}
+		}
+		
+		return $body;
+	}
+	
+	public function add_responce($res, $type, $id) {
+		$other_setting = $this->_unserialized(get_post_meta( $id, 'other_setting', true ));
+		
+		foreach ( $other_setting as $setting ) {
+			$setting = explode(':', $setting);
+			if ( $setting[0] == 'server' )
+				$res['data'][$setting[1]] = $_SERVER[$setting[1]];
+		}
+			
+		return $res;
+	}
+	
+	public function entry_action( $entry, $form_id, $entry_id ) {
+		$other_setting = $this->_unserialized(get_post_meta( $form_id, 'other_setting', true ));
+		foreach ( $other_setting as $setting ) {
+			$setting = explode(':', $setting);
+			if ( $setting[0] == 'server' && array_key_exists( $setting[1], $entry['data'] ) )
+				echo '<tr><th scope="row">' . esc_html($setting[1]) . '</th><td>' . $entry['data'][$setting[1]] . '</td></tr>';
+
+		}
+	}
+}
+new Trust_Form_Other_Setting();
 ?>
