@@ -493,3 +493,6 @@ msgstr "その他の設定"
 
 msgid "The e-mail mismatch"
 msgstr "メールアドレスが一致しません"
+
+msgid "E-Mail Confirm Title"
+msgstr ""

@@ -475,3 +475,7 @@ msgstr ""
 
 msgid "The e-mail mismatch"
 msgstr ""
+
+msgid "E-Mail Confirm Title"
+msgstr ""
+

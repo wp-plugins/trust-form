@@ -722,7 +722,8 @@ jQuery(document).ready(function() {
 			if (jQuery(this).find('div.subject > span.content, div.submessage > span.content').children("input").length) {
 				jQuery(this).find('div.subject > span.content, div.submessage > span.content').children("input").blur();
 			}
-
+			name = jQuery(this).children('.setting-element-discription').find('input,select,textarea').prop('name');
+			name = name.replace('[]', '');
 			validation = {};
 			//textboxのバリデーション
 			if (jQuery(this).hasClass('textbox-container')) {
@@ -732,8 +733,8 @@ jQuery(document).ready(function() {
 					validation['min'] = jQuery(this).find('input[name=textbox-min-check]').is(':checked') ? jQuery(this).find('input[name=textbox-min]').val() : '';
 					validation['max'] = jQuery(this).find('input[name=textbox-max-check]').is(':checked') ? jQuery(this).find('input[name=textbox-max]').val() : '';
 				}
-				validation['charactor'] = jQuery(this).find('input[name=textbox-characters]').is(':checked') ? jQuery(this).find('input[name=textbox-character]:checked').val() : "";
-				validation['multi-charactor'] = jQuery(this).find('input[name=textbox-multi-characters]').is(':checked') ? jQuery(this).find('input[name=textbox-multi-character]:checked').val() : '';
+				validation['charactor'] = jQuery(this).find('input[name=textbox-characters]').is(':checked') ? jQuery(this).find('input[name=textbox-character-'+name+']:checked').val() : "";
+				validation['multi-charactor'] = jQuery(this).find('input[name=textbox-multi-characters]').is(':checked') ? jQuery(this).find('input[name=textbox-multi-character-'+name+']:checked').val() : '';
 			}
 			
 			//textareaのバリデーション
@@ -765,8 +766,6 @@ jQuery(document).ready(function() {
 				validation['required'] = jQuery(this).find('input[name=e-mail-required]').is(':checked') ? 'true' : '';
 				validation['e_mail_confirm'] = jQuery(this).find('.edit-element-container input[name=email-confirm-title]').val();
 			}
-			name = jQuery(this).children('.setting-element-discription').find('input,select,textarea').prop('name');
-			name = name.replace('[]', '');
 
 			param['name'][i] = {};
 			param['name'][i][name] = jQuery(this).children('th.setting-element-title').children('div.subject').children('span.content').html();
@@ -804,7 +803,7 @@ jQuery(document).ready(function() {
 				param['attr']['maxlength'][name] = jQuery(this).find('.setting-element-discription > input').attr('maxlength') ? jQuery(this).find-('.setting-element-discription > input').attr('maxlength') : '';
 				param['attr']['class'][name] = jQuery(this).find('.setting-element-discription > input').attr('class') ? jQuery(this).find('.setting-element-discription > input').attr('class') : '' ;
 			}
-			param['attr']['akismet'][name] = jQuery(this).find('.edit-element-container input[name=akismet-config]:checked').val();
+			param['attr']['akismet'][name] = jQuery(this).find('.edit-element-container input[name=akismet-config-'+name+']:checked').val();
 			param['form_front']['element'][name] = jQuery(this).children('td.setting-element-discription').html();
 		});
 		
@@ -2296,35 +2295,41 @@ class Trust_Form_Front {
 					if ( isset($this->validate[0][$key]['required']) && $this->validate[0][$key]['required'] == 'true' && !Trust_Form_Validator::required($_POST[$key]) )
 						$this->err_msg[$key][] = $Trust_Form_Validator_Message['required'];
 					//length
-					if ( isset($this->validate[0][$key]['min']) && is_numeric($this->validate[0][$key]['min']) 
-					&& isset($this->validate[0][$key]['max']) && is_numeric($this->validate[0][$key]['max'])  
-					&& (!Trust_Form_Validator::maxlength($_POST[$key], $this->validate[0][$key]['max']) 
-					|| !Trust_Form_Validator::minlength($_POST[$key], $this->validate[0][$key]['min']))) {
-						$tmp = str_replace( '__maxlength__', $this->validate[0][$key]['max'], $Trust_Form_Validator_Message['bothlength'] );
-						$tmp = str_replace( '__minlength__', $this->validate[0][$key]['min'], $tmp );
-						$this->err_msg[$key][] = $tmp;
-					} elseif ( isset($this->validate[0][$key]['min']) && is_numeric($this->validate[0][$key]['min']) && !Trust_Form_Validator::minlength($_POST[$key], $this->validate[0][$key]['min'])) {
-						$this->err_msg[$key][] = str_replace( '__minlength__', $this->validate[0][$key]['min'], $Trust_Form_Validator_Message['minlength'] );
-					} elseif ( isset($this->validate[0][$key]['max']) && is_numeric($this->validate[0][$key]['max']) && !Trust_Form_Validator::maxlength($_POST[$key], $this->validate[0][$key]['max'])) {
-						$this->err_msg[$key][] = str_replace( '__maxlength__', $this->validate[0][$key]['max'], $Trust_Form_Validator_Message['maxlength'] );
+					if ( $_POST[$key] != '' ) {
+						if ( isset($this->validate[0][$key]['min']) && is_numeric($this->validate[0][$key]['min']) 
+						&& isset($this->validate[0][$key]['max']) && is_numeric($this->validate[0][$key]['max'])  
+						&& (!Trust_Form_Validator::maxlength($_POST[$key], $this->validate[0][$key]['max']) 
+						|| !Trust_Form_Validator::minlength($_POST[$key], $this->validate[0][$key]['min']))) {
+							$tmp = str_replace( '__maxlength__', $this->validate[0][$key]['max'], $Trust_Form_Validator_Message['bothlength'] );
+							$tmp = str_replace( '__minlength__', $this->validate[0][$key]['min'], $tmp );
+							$this->err_msg[$key][] = $tmp;
+						} elseif ( isset($this->validate[0][$key]['min']) && is_numeric($this->validate[0][$key]['min']) && !Trust_Form_Validator::minlength($_POST[$key], $this->validate[0][$key]['min'])) {
+							$this->err_msg[$key][] = str_replace( '__minlength__', $this->validate[0][$key]['min'], $Trust_Form_Validator_Message['minlength'] );
+						} elseif ( isset($this->validate[0][$key]['max']) && is_numeric($this->validate[0][$key]['max']) && !Trust_Form_Validator::maxlength($_POST[$key], $this->validate[0][$key]['max'])) {
+							$this->err_msg[$key][] = str_replace( '__maxlength__', $this->validate[0][$key]['max'], $Trust_Form_Validator_Message['maxlength'] );
+						}
 					}
 					//charactors
-					if ( isset($this->validate[0][$key]['charactor']) && $this->validate[0][$key]['charactor'] == 'alphabet' && !Trust_Form_Validator::isAlpha($_POST[$key]) ){
-						$this->err_msg[$key][] = $Trust_Form_Validator_Message['eiji'];
-					} elseif ( isset($this->validate[0][$key]['charactor']) && $this->validate[0][$key]['charactor'] == 'numeric' && !Trust_Form_Validator::isNumber($_POST[$key]) ){
-						$this->err_msg[$key][] = $Trust_Form_Validator_Message['number'];
-					} elseif ( isset($this->validate[0][$key]['charactor']) && $this->validate[0][$key]['charactor'] == 'alphanumeric' && !Trust_Form_Validator::isHankaku($_POST[$key]) ){
-						$this->err_msg[$key][] = $Trust_Form_Validator_Message['hankaku'];
-					} elseif ( isset($this->validate[0][$key]['charactor']) && $this->validate[0][$key]['charactor'] == 'alphanumeric-and-code' && !Trust_Form_Validator::isHankaku2($_POST[$key]) ){
-						$this->err_msg[$key][] = $Trust_Form_Validator_Message['hankaku2'];
+					if ( $_POST[$key] != '' ) {
+						if ( isset($this->validate[0][$key]['charactor']) && $this->validate[0][$key]['charactor'] == 'alphabet' && !Trust_Form_Validator::isAlpha($_POST[$key]) ){
+							$this->err_msg[$key][] = $Trust_Form_Validator_Message['eiji'];
+						} elseif ( isset($this->validate[0][$key]['charactor']) && $this->validate[0][$key]['charactor'] == 'numeric' && !Trust_Form_Validator::isNumber($_POST[$key]) ){
+							$this->err_msg[$key][] = $Trust_Form_Validator_Message['number'];
+						} elseif ( isset($this->validate[0][$key]['charactor']) && $this->validate[0][$key]['charactor'] == 'alphanumeric' && !Trust_Form_Validator::isHankaku($_POST[$key]) ){
+							$this->err_msg[$key][] = $Trust_Form_Validator_Message['hankaku'];
+						} elseif ( isset($this->validate[0][$key]['charactor']) && $this->validate[0][$key]['charactor'] == 'alphanumeric-and-code' && !Trust_Form_Validator::isHankaku2($_POST[$key]) ){
+							$this->err_msg[$key][] = $Trust_Form_Validator_Message['hankaku2'];
+						}
 					}
 					//multibyte-charactors
-					if ( isset($this->validate[0][$key]['multi-charactor']) && $this->validate[0][$key]['multi-charactor'] == 'multibyte' && !Trust_Form_Validator::isZenkaku($_POST[$key]) ){
-						$this->err_msg[$key][] = $Trust_Form_Validator_Message['zenkaku'];
-					} elseif( isset($this->validate[0][$key]['multi-charactor']) && $this->validate[0][$key]['multi-charactor'] == 'katakana' && !Trust_Form_Validator::isKatakana($_POST[$key]) ){
-						$this->err_msg[$key][] = $Trust_Form_Validator_Message['katakana'];
-					} elseif( isset($this->validate[0][$key]['multi-charactor']) && $this->validate[0][$key]['multi-charactor'] == 'hiragana' && !Trust_Form_Validator::isHiragana($_POST[$key]) ){
-						$this->err_msg[$key][] = $Trust_Form_Validator_Message['hiragana'];
+					if ( $_POST[$key] != '' ) {
+						if ( isset($this->validate[0][$key]['multi-charactor']) && $this->validate[0][$key]['multi-charactor'] == 'multibyte' && !Trust_Form_Validator::isZenkaku($_POST[$key]) ){
+							$this->err_msg[$key][] = $Trust_Form_Validator_Message['zenkaku'];
+						} elseif( isset($this->validate[0][$key]['multi-charactor']) && $this->validate[0][$key]['multi-charactor'] == 'katakana' && !Trust_Form_Validator::isKatakana($_POST[$key]) ){
+							$this->err_msg[$key][] = $Trust_Form_Validator_Message['katakana'];
+						} elseif( isset($this->validate[0][$key]['multi-charactor']) && $this->validate[0][$key]['multi-charactor'] == 'hiragana' && !Trust_Form_Validator::isHiragana($_POST[$key]) ){
+							$this->err_msg[$key][] = $Trust_Form_Validator_Message['hiragana'];
+						}
 					}
 					break;
 				case 'radio':
