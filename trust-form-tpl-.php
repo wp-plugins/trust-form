@@ -33,6 +33,9 @@ EOT;
 </tbody>
 </table>
 {$nonce}
+EOT;
+$html = apply_filters( 'tr_input_footer', $html );
+$html .= <<<EOT
 <p id="confirm-button" class="submit-container">{$trust_form->get_form('input_bottom')}</p>
 </form>
 </div>
@@ -46,7 +49,7 @@ EOT;
 function trust_form_show_confirm() {
 	global $trust_form;
 	$col_name = $trust_form->get_col_name();
-
+	$validates = $trust_form->get_validate();
 	$nonce = wp_nonce_field('trust_form','trust_form_confirm_nonce_field');
 
 	$html = <<<EOT
@@ -57,6 +60,11 @@ function trust_form_show_confirm() {
 <tbody>
 EOT;
 	foreach ( $col_name as $key => $name ) {
+		foreach ( $validates as $validate ) {
+			if ( array_key_exists('e_mail_confirm', $validate) && in_array( $name, $validate ) )
+				continue 2;
+		}
+	
 		$html .= '<tr><th><div class="subject">'.$name.'</div></th><td><div>'.$trust_form->get_input_data($key).'</div>';
 		$html .= '</td></tr>';
 	}
@@ -64,6 +72,9 @@ EOT;
 </tbody>
 </table>
 {$nonce}
+EOT;
+$html = apply_filters( 'tr_confirm_footer', $html );
+$html .= <<<EOT
 <p id="confirm-button" class="submit-container">{$trust_form->get_form('confirm_bottom')}</p>
 </form>
 </div>
