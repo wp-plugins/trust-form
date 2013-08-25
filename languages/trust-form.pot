@@ -1,5 +1,3 @@
-msgid ""
-msgstr ""
 "Project-Id-Version: Trust Forms\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-09-19 22:01+0900\n"
@@ -476,6 +474,6 @@ msgstr ""
 msgid "The e-mail mismatch"
 msgstr ""
 
-msgid "E-Mail Confirm Title"
+msgid "Re-entering E-mail"
 msgstr ""
 

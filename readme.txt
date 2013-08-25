@@ -3,7 +3,7 @@ Contributors: horike
 Tags:  form, contact form, contact
 Requires at least: 3.3
 Tested up to: 3.5.1
-Stable tag: 1.7.1
+Stable tag: 1.8.0
 
 Trust Form is a contact form with confirmation screen and mail and data base support.
 
@@ -91,3 +91,7 @@ Please contact to me.
 * Write `[title]` of form element on From Name, From, mail body. Then replace submit content from the form.
 = 1.7.1 =
 * Add filter hook for validate message.
+= 1.8.0 =
+* Default css corresponding to responsive by making [Aihara Chieko](http://webourgeon.com/)
+* Add e-mail re-entering.
+* Add other setting

@@ -288,7 +288,7 @@ function trustform_standard_form_meta_box() {
 		  <li><input type="radio" name="akismet-config" value="author_email" /><?php echo esc_html( __( 'author_email', TRUST_FORM_DOMAIN ) ); ?></li>
 		  <li><input type="radio" name="akismet-config" value="author_url" /><?php echo esc_html( __( 'author_url', TRUST_FORM_DOMAIN ) ); ?></li>
 	    </ul>
-	    <div class="text-edit-content-title"><strong><?php echo esc_html(  __( 'E-Mail Confirm Title', TRUST_FORM_DOMAIN ) ); ?></strong></div>
+	    <div class="text-edit-content-title"><strong><?php echo esc_html(  __( 'Re-entering E-mail', TRUST_FORM_DOMAIN ) ); ?></strong></div>
 		<hr class="text-edit-conten-spencer">
 		<ul style="text-align:left;">
 		  <li><input type="text" name="email-confirm-title" value="" /></li>
