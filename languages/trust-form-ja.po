@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Trust Forms\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-09-19 22:01+0900\n"
-"PO-Revision-Date: 2013-02-05 16:30+0900\n"
+"PO-Revision-Date: 2013-08-25 23:40+0900\n"
 "Last-Translator: horike <horike@digitalcube.jp>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "X-Poedit-KeywordsList: __;_e;__ngettext:1,2;_c\n"
 "X-Poedit-Basepath: ../..\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Poedit 1.5.4\n"
+"X-Generator: Poedit 1.5.5\n"
 "X-Poedit-SearchPath-0: trust-forms\n"
 
 # ######### trust-forms/trust-forms.php ###########
@@ -268,7 +268,7 @@ msgid "cols"
 msgstr "cols"
 
 #: line 121,130,153,162
-msgid "option value"
+msgid "Select"
 msgstr "オプション値"
 
 #: line 185,193
@@ -487,3 +487,12 @@ msgid ""
 msgstr ""
 "Trust Formはあなたのサポートを必要としています。あなた寄付でこのプラグインは"
 "もっと良くなることができます。"
+
+msgid "Other Setting"
+msgstr "その他の設定"
+
+msgid "The e-mail mismatch"
+msgstr "メールアドレスが一致しません"
+
+msgid "Re-entering E-mail"
+msgstr ""

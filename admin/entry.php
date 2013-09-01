@@ -28,6 +28,7 @@ foreach ( $responce[$entry]['title'] as $key => $e ){
 <tr><th scope="row"><?php echo esc_html($e); ?></th><td><?php echo str_replace( "\n", '<br />', esc_html($responce[$entry]['data'][$key])); ?></td></tr>
 <?php
 }
+do_action( 'tr_entry_action', $responce[$entry], $form, $entry );
 $notes = $responce[$entry]['note'];
 ?>
 </table>
@@ -58,7 +59,7 @@ if ( $note['status'] == 'new' ) {
 <input type="hidden" name="action" value="add" />
 <input type="hidden" name="form" value="<?php echo esc_html( $form ); ?>" />
 <input type="hidden" name="entry" value="<?php echo esc_html( $entry ); ?>" />
-<textarea name="add_note" cols="60"></textarea>
+<textarea name="add_note" style="width:100%;" ></textarea>
 <input type="submit" class="button-primary" value="<?php echo esc_html( __( 'Add Note', TRUST_FORM_DOMAIN ) ); ?>"> 
 <select name="entry_status">
 <option <?php selected($status, 'new'); ?> value="new"><?php echo __( 'New', TRUST_FORM_DOMAIN ); ?></option>

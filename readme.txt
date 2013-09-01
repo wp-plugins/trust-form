@@ -2,8 +2,8 @@
 Contributors: horike
 Tags:  form, contact form, contact
 Requires at least: 3.3
-Tested up to: 3.5.1
-Stable tag: 1.6.0
+Tested up to: 3.6
+Stable tag: 1.8.1
 
 Trust Form is a contact form with confirmation screen and mail and data base support.
 
@@ -87,3 +87,13 @@ Please contact to me.
 = 1.6.0 =
 * Remove the function of CSS EDITOR. But you can restore this function when you write define( 'TRUST_FORM_DEFAULT_STYLE', false ); in wp-config.php,
 * Add default css by making [Aihara Chieko](http://webourgeon.com/)
+= 1.7.0 =
+* Write `[title]` of form element on From Name, From, mail body. Then replace submit content from the form.
+= 1.7.1 =
+* Add filter hook for validate message.
+= 1.8.0 =
+* Default css corresponding to responsive by making [Aihara Chieko](http://webourgeon.com/)
+* Add e-mail re-entering.
+* Add other setting.
+= 1.8.1 =
+* Fixd a bug that warning error on finish screen.

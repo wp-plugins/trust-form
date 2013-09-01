@@ -1,5 +1,3 @@
-msgid ""
-msgstr ""
 "Project-Id-Version: Trust Forms\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-09-19 22:01+0900\n"
@@ -267,7 +265,7 @@ msgid "cols"
 msgstr ""
 
 #: line 121,130,153,162
-msgid "option value"
+msgid "Select"
 msgstr ""
 
 #: line 185,193
@@ -469,3 +467,13 @@ msgstr ""
 
 msgid "Trust Form is in need of your support. You will be able to better this plug-in your donation."
 msgstr ""
+
+msgid "Other Setting"
+msgstr ""
+
+msgid "The e-mail mismatch"
+msgstr ""
+
+msgid "Re-entering E-mail"
+msgstr ""
+
