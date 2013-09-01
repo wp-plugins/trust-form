@@ -4,7 +4,7 @@ Plugin Name: Trust Form
 Plugin URI: http://www.kakunin-pl.us/
 Description: Trust Form is a contact form with confirmation screen and mail and data base support.
 Author: horike takahiro
-Version: 1.8.0
+Version: 1.8.1
 Author URI: http://www.kakunin-pl.us/
 
 
@@ -37,7 +37,7 @@ if ( ! defined( 'TRUST_FORM_PLUGIN_DIR' ) )
 new Trust_Form();
 
 class Trust_Form {
-	private $version = '1.8.0';
+	private $version = '1.8.1';
 	private $edit_page;
 	private $entries_page;
 	private $base_dir;
@@ -1394,7 +1394,7 @@ class Trust_Form_Entries_List_Table extends WP_List_Table {
 		/**
 		 * First, lets decide how many records per page to show
 		 */
-		$per_page = 5;
+		$per_page = 30;
 
 		/**
 		 * REQUIRED. Now we need to define our column headers. This includes a complete
@@ -1709,7 +1709,7 @@ class Trust_Form_Edit_List_Table extends WP_List_Table {
 		/**
 		 * First, lets decide how many records per page to show
 		 */
-		$per_page = 5;
+		$per_page = 30;
 
 		/**
 		 * REQUIRED. Now we need to define our column headers. This includes a complete
@@ -2093,7 +2093,9 @@ class Trust_Form_Front {
 					$new_responce['data'][$key] = rtrim($checkbox, ',');
 					break;
 				default:
-					$new_responce['data'][$key] = $_POST[$key];
+					if ( isset($_POST[$key]) ) {
+						$new_responce['data'][$key] = $_POST[$key];
+					}
 					break;
 			}
 			$new_responce['title'][$key] = $name;
@@ -2204,14 +2206,18 @@ class Trust_Form_Front {
 		}
 
 		foreach ( $this->name[0] as $key => $name ) {
-			if ( preg_match('/['.$name.']/i', $body) )
-				$body = str_replace( '['.$name.']', $data['data'][$key], $body );
+			if ( preg_match('/['.$name.']/i', $body) ) {
+				if ( isset($data['data'][$key]) )
+					$body = str_replace( '['.$name.']', $data['data'][$key], $body );
+			}
 		}
 
 		$subject = $this->user_mail[0]['subject2'];
 		foreach ( $this->name[0] as $key => $name ) {
-			if ( preg_match('/['.$name.']/i', $subject) )
-				$subject = str_replace( '['.$name.']', $data['data'][$key], $subject );
+			if ( preg_match('/['.$name.']/i', $subject) ) {
+				if ( isset($data['data'][$key]) )
+					$subject = str_replace( '['.$name.']', $data['data'][$key], $subject );
+			}
 		}
 		$subject = apply_filters( 'tr_pre_auto_reply_mail_subject', $subject, $data['data'], $id );
 		$body = apply_filters( 'tr_pre_auto_reply_mail_body', $body, $data['data'], $id );
@@ -2229,7 +2235,7 @@ class Trust_Form_Front {
 		$data['data'] = apply_filters( 'tr_pre_admin_mail', $data['data'], $id );
 		$body = '';
 		if ( !defined( 'TRUST_FORM_DB_SUPPORT' ) || TRUST_FORM_DB_SUPPORT !== false ) {
-			$body .= admin_url( '?page=trust-form-entries&form='.$id.'&status=new' );
+			$body .= admin_url( '/admin.php?page=trust-form-entries&form='.$id.'&status=new' );
 			$body .= "\n\n";
 		}
 		foreach ( $data['data'] as $key => $res ) {
@@ -2245,8 +2251,10 @@ class Trust_Form_Front {
 
 		$subject = $this->admin_mail[0]['subject'];
 		foreach ( $this->name[0] as $key => $name ) {
-			if ( preg_match('/['.$name.']/i', $subject) )
-				$subject = str_replace( '['.$name.']', $data['data'][$key], $subject );
+			if ( preg_match('/['.$name.']/i', $subject) ) {
+				if ( isset($data['data'][$key]) )
+					$subject = str_replace( '['.$name.']', $data['data'][$key], $subject );
+			}
 		}
 
 		$subject = apply_filters( 'tr_subject_admin_mail', $subject, $data['data'], $id );
@@ -2297,7 +2305,7 @@ class Trust_Form_Front {
 					if ( isset($this->validate[0][$key]['required']) && $this->validate[0][$key]['required'] == 'true' && !Trust_Form_Validator::required($_POST[$key]) )
 						$this->err_msg[$key][] = $Trust_Form_Validator_Message['required'];
 					//length
-					if ( $_POST[$key] != '' ) {
+					if ( isset($_POST[$key]) && $_POST[$key] != '' ) {
 						if ( isset($this->validate[0][$key]['min']) && is_numeric($this->validate[0][$key]['min']) 
 						&& isset($this->validate[0][$key]['max']) && is_numeric($this->validate[0][$key]['max'])  
 						&& (!Trust_Form_Validator::maxlength($_POST[$key], $this->validate[0][$key]['max']) 
@@ -2312,7 +2320,7 @@ class Trust_Form_Front {
 						}
 					}
 					//charactors
-					if ( $_POST[$key] != '' ) {
+					if ( isset($_POST[$key]) && $_POST[$key] != '' ) {
 						if ( isset($this->validate[0][$key]['charactor']) && $this->validate[0][$key]['charactor'] == 'alphabet' && !Trust_Form_Validator::isAlpha($_POST[$key]) ){
 							$this->err_msg[$key][] = $Trust_Form_Validator_Message['eiji'];
 						} elseif ( isset($this->validate[0][$key]['charactor']) && $this->validate[0][$key]['charactor'] == 'numeric' && !Trust_Form_Validator::isNumber($_POST[$key]) ){
@@ -2324,7 +2332,7 @@ class Trust_Form_Front {
 						}
 					}
 					//multibyte-charactors
-					if ( $_POST[$key] != '' ) {
+					if ( isset($_POST[$key]) && $_POST[$key] != '' ) {
 						if ( isset($this->validate[0][$key]['multi-charactor']) && $this->validate[0][$key]['multi-charactor'] == 'multibyte' && !Trust_Form_Validator::isZenkaku($_POST[$key]) ){
 							$this->err_msg[$key][] = $Trust_Form_Validator_Message['zenkaku'];
 						} elseif( isset($this->validate[0][$key]['multi-charactor']) && $this->validate[0][$key]['multi-charactor'] == 'katakana' && !Trust_Form_Validator::isKatakana($_POST[$key]) ){
@@ -2676,10 +2684,12 @@ class Trust_Form_Other_Setting {
 	public function admin_mail( $body, $data, $id ) {
 		$other_setting = $this->_unserialized(get_post_meta( $id, 'other_setting', true ));
 		
-		foreach ( $other_setting as $setting ) {
-			$setting = explode(':', $setting);
-			if ( $setting[0] == 'server' && isset($data[$setting[1]]) ) {
-				$body .= $setting[1] .': '. $data[$setting[1]] . "\n\n";
+		if ( is_array($other_setting) ) {
+			foreach ( $other_setting as $setting ) {
+				$setting = explode(':', $setting);
+				if ( $setting[0] == 'server' && isset($data[$setting[1]]) ) {
+					$body .= $setting[1] .': '. $data[$setting[1]] . "\n\n";
+				}
 			}
 		}
 		
@@ -2689,10 +2699,12 @@ class Trust_Form_Other_Setting {
 	public function add_responce($res, $type, $id) {
 		$other_setting = $this->_unserialized(get_post_meta( $id, 'other_setting', true ));
 		
-		foreach ( $other_setting as $setting ) {
-			$setting = explode(':', $setting);
-			if ( $setting[0] == 'server' )
-				$res['data'][$setting[1]] = $_SERVER[$setting[1]];
+		if ( is_array($other_setting) ) {
+			foreach ( $other_setting as $setting ) {
+				$setting = explode(':', $setting);
+				if ( $setting[0] == 'server' )
+					$res['data'][$setting[1]] = $_SERVER[$setting[1]];
+			}
 		}
 			
 		return $res;
@@ -2700,11 +2712,12 @@ class Trust_Form_Other_Setting {
 	
 	public function entry_action( $entry, $form_id, $entry_id ) {
 		$other_setting = $this->_unserialized(get_post_meta( $form_id, 'other_setting', true ));
-		foreach ( $other_setting as $setting ) {
-			$setting = explode(':', $setting);
-			if ( $setting[0] == 'server' && array_key_exists( $setting[1], $entry['data'] ) )
-				echo '<tr><th scope="row">' . esc_html($setting[1]) . '</th><td>' . $entry['data'][$setting[1]] . '</td></tr>';
-
+		if ( is_array($other_setting) ) {
+			foreach ( $other_setting as $setting ) {
+				$setting = explode(':', $setting);
+				if ( $setting[0] == 'server' && array_key_exists( $setting[1], $entry['data'] ) )
+					echo '<tr><th scope="row">' . esc_html($setting[1]) . '</th><td>' . $entry['data'][$setting[1]] . '</td></tr>';
+			}
 		}
 	}
 }
