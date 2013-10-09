@@ -180,7 +180,7 @@ function trustform_standard_form_meta_box() {
     <th scope="row" class="setting-element-title" style="visibility: hidden;"><div class="subject"><span class="content">title</span><span class="require"></span></div><div class="submessage"><span class="content"></span></div></th>
     <td class="setting-element-discription" style="visibility: hidden;">
       <ul>
-        <li><input type="radio" /><?php echo esc_html(  __( 'option value', TRUST_FORM_DOMAIN ) );?></li>
+        <li><input type="radio" /><?php echo esc_html(  __( 'Select', TRUST_FORM_DOMAIN ) );?></li>
       </ul>
     </td>
     <td class="setting-element-editor" style="display:none">
@@ -189,7 +189,7 @@ function trustform_standard_form_meta_box() {
         <img class="edit-menu-icon text-delete delete-button" src="images/no.png">
         <div class="text-edit-content display-out">
           <div class="edit-content-title"><span><strong><?php echo esc_html(  __( 'Radio', TRUST_FORM_DOMAIN )); ?></strong></span><img class="del-icon" src="<?php echo TRUST_FORM_PLUGIN_URL.'/images/del.gif'; ?>"></div>
-          <div class="text-edit-content-title"><strong><?php echo esc_html(  __( 'option value', TRUST_FORM_DOMAIN ) ); ?></strong></div>           
+          <div class="text-edit-content-title"><strong><?php echo esc_html(  __( 'Select', TRUST_FORM_DOMAIN ) ); ?></strong></div>           
           <hr class="text-edit-conten-spencer" />
           <textarea class="option-value-editor" role="radio" cols="35" rows="5" ></textarea>
           <div class="text-edit-content-title"><strong><?php echo esc_html(  __( 'validation', TRUST_FORM_DOMAIN ) ); ?></strong></div>
@@ -288,6 +288,11 @@ function trustform_standard_form_meta_box() {
 		  <li><input type="radio" name="akismet-config" value="author_email" /><?php echo esc_html( __( 'author_email', TRUST_FORM_DOMAIN ) ); ?></li>
 		  <li><input type="radio" name="akismet-config" value="author_url" /><?php echo esc_html( __( 'author_url', TRUST_FORM_DOMAIN ) ); ?></li>
 	    </ul>
+	    <div class="text-edit-content-title"><strong><?php echo esc_html(  __( 'Re-entering E-mail', TRUST_FORM_DOMAIN ) ); ?></strong></div>
+		<hr class="text-edit-conten-spencer">
+		<ul style="text-align:left;">
+		  <li><input type="text" name="email-confirm-title" value="" /></li>
+		</ul>
 	  </div>
 	</div>
   </td>
@@ -410,7 +415,7 @@ $admin_mail = !isset( $_GET['action'] ) || 'edit' != $_GET['action'] ? '' : get_
 <?php
 }
 add_meta_box( 'auto-reply-mail', __( 'Auto-reply Mail', TRUST_FORM_DOMAIN ), 'trustform_auto_reply_mail_meta_box', 'trustform', 'default', 'core' );
-do_meta_boxes( 'trustform', 'default', $this );
+//do_meta_boxes( 'trustform', 'default', $this );
 function trustform_auto_reply_mail_meta_box() {
 $form_id = !isset( $_GET['form'] ) || !is_numeric($_GET['form']) ? '' : $_GET['form'] ;
 $user_mail = !isset( $_GET['action'] ) || 'edit' != $_GET['action'] ? '' : get_post_meta( $form_id, 'user_mail' ) ;
@@ -425,6 +430,16 @@ $user_mail = !isset( $_GET['action'] ) || 'edit' != $_GET['action'] ? '' : get_p
 </table>
 </form>
 <?php
+}
+
+add_meta_box( 'other-setting', __( 'Other Setting', TRUST_FORM_DOMAIN ), 'trustform_other_setting_meta_box', 'trustform', 'default', 'core' );
+do_meta_boxes( 'trustform', 'default', $this );
+function trustform_other_setting_meta_box() {
+$form_id = !isset( $_GET['form'] ) || !is_numeric($_GET['form']) ? '' : $_GET['form'] ;
+$other_setting = !isset( $_GET['action'] ) || 'edit' != $_GET['action'] ? '' : get_post_meta( $form_id, 'other_setting' ) ;
+?>
+<textarea id="trust-form-other-setting" name="other-setting" rows="7" cols="70" ><?php echo $other_setting != '' && isset($other_setting[0]) ? $other_setting[0] : ''; ?></textarea>
+<?php	
 }
 
 ?>

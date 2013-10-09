@@ -443,6 +443,10 @@ var addTrustForm,TR_element_count = 0;
 						//name属性を付加
 						if ( a(ui.item).find(".setting-element-discription").find('input').attr('type') != 'checkbox' ) {
 							a(ui.item).find(".setting-element-discription").find('input,select,textarea').attr('name',"element-"+TR_element_count);
+							a(ui.item).find("input[name=akismet-config]").attr( 'name', 'akismet-config-element-'+ TR_element_count);
+							a(ui.item).find("input[name=textbox-character]").attr( 'name', 'textbox-character-element-'+ TR_element_count);
+							a(ui.item).find("input[name=textbox-multi-character]").attr( 'name', 'textbox-multi-character-element-'+ TR_element_count);
+
 						} else {
 							a(ui.item).find(".setting-element-discription").find('input').attr('name',"element-"+TR_element_count+"[]");
 						}

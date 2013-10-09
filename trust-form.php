@@ -4,7 +4,7 @@ Plugin Name: Trust Form
 Plugin URI: http://www.kakunin-pl.us/
 Description: Trust Form is a contact form with confirmation screen and mail and data base support.
 Author: horike takahiro
-Version: 1.6.0
+Version: 1.8.2
 Author URI: http://www.kakunin-pl.us/
 
 
@@ -25,7 +25,6 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-
 if ( ! defined( 'TRUST_FORM_DOMAIN' ) )
 	define( 'TRUST_FORM_DOMAIN', 'trust-form' );
 	
@@ -38,7 +37,7 @@ if ( ! defined( 'TRUST_FORM_PLUGIN_DIR' ) )
 new Trust_Form();
 
 class Trust_Form {
-	private $version = '1.6.0';
+	private $version = '1.8.2';
 	private $edit_page;
 	private $entries_page;
 	private $base_dir;
@@ -220,7 +219,8 @@ class Trust_Form {
 									'form_admin_confirm' => get_post_meta( $form_id, 'form_admin_confirm' ),
 									'form_admin_finish' => get_post_meta( $form_id, 'form_admin_finish' ),
 									'form_front' => get_post_meta( $form_id, 'form_front' ),
-									'config' => get_post_meta( $form_id, 'config' )
+									'config' => get_post_meta( $form_id, 'config' ),
+									'other_setting' => get_post_meta( $form_id, 'other_setting' )
 								);
 						update_post_meta( $new_id, 'name', $data['name'][0] );
 						update_post_meta( $new_id, 'attention', $data['attention'][0] );
@@ -234,6 +234,7 @@ class Trust_Form {
 						update_post_meta( $new_id, 'form_admin_finish', $data['form_admin_finish'][0] );
 						update_post_meta( $new_id, 'form_front', $data['form_front'][0] );
 						update_post_meta( $new_id, 'config', $data['config'][0] );
+						update_post_meta( $new_id, 'other_setting', $data['other_setting'][0] );
 
 						@copy( $this->plugin_dir . '/css/front.css', $this->plugin_dir . '/css/front_'.$new_id.'.css' );
 
@@ -339,7 +340,9 @@ class Trust_Form {
 				}
 			}
 
-			if ( function_exists('mb_convert_variables') ) {
+			if ( defined( 'TRUST_FORM_CSV_SJIS_SUPPORT' ) 
+			&& TRUST_FORM_CSV_SJIS_SUPPORT === true 
+			&& function_exists('mb_convert_variables') ) {
 				mb_convert_variables('SJIS', 'UTF-8', $csv_ti);
 				mb_convert_variables('SJIS', 'UTF-8', $csv);
 			}
@@ -699,12 +702,14 @@ jQuery(document).ready(function() {
 				      cols:{},
 				      rows:{},
 				      class:{},
-				      akismet:{}},
+				      akismet:{},
+				      e_mail_confirm:{}},
 				admin_mail:{},
 				user_mail:{},
 				form_admin:{},
 				form_front:{element:{}},
-				config:{}
+				config:{},
+				other_setting:{}
 				};
 		if (!jQuery('#setting-form tbody tr').not('#first-setting-info').length) {
 			return false;
@@ -717,7 +722,8 @@ jQuery(document).ready(function() {
 			if (jQuery(this).find('div.subject > span.content, div.submessage > span.content').children("input").length) {
 				jQuery(this).find('div.subject > span.content, div.submessage > span.content').children("input").blur();
 			}
-
+			name = jQuery(this).children('.setting-element-discription').find('input,select,textarea').prop('name');
+			name = name.replace('[]', '');
 			validation = {};
 			//textboxのバリデーション
 			if (jQuery(this).hasClass('textbox-container')) {
@@ -727,8 +733,8 @@ jQuery(document).ready(function() {
 					validation['min'] = jQuery(this).find('input[name=textbox-min-check]').is(':checked') ? jQuery(this).find('input[name=textbox-min]').val() : '';
 					validation['max'] = jQuery(this).find('input[name=textbox-max-check]').is(':checked') ? jQuery(this).find('input[name=textbox-max]').val() : '';
 				}
-				validation['charactor'] = jQuery(this).find('input[name=textbox-characters]').is(':checked') ? jQuery(this).find('input[name=textbox-character]:checked').val() : "";
-				validation['multi-charactor'] = jQuery(this).find('input[name=textbox-multi-characters]').is(':checked') ? jQuery(this).find('input[name=textbox-multi-character]:checked').val() : '';
+				validation['charactor'] = jQuery(this).find('input[name=textbox-characters]').is(':checked') ? jQuery(this).find('input[name=textbox-character-'+name+']:checked').val() : "";
+				validation['multi-charactor'] = jQuery(this).find('input[name=textbox-multi-characters]').is(':checked') ? jQuery(this).find('input[name=textbox-multi-character-'+name+']:checked').val() : '';
 			}
 			
 			//textareaのバリデーション
@@ -758,15 +764,15 @@ jQuery(document).ready(function() {
 			//emailのバリデーション
 			if (jQuery(this).hasClass('e-mail-container')) {
 				validation['required'] = jQuery(this).find('input[name=e-mail-required]').is(':checked') ? 'true' : '';
+				validation['e_mail_confirm'] = jQuery(this).find('.edit-element-container input[name=email-confirm-title]').val();
 			}
-			name = jQuery(this).children('.setting-element-discription').find('input,select,textarea').prop('name');
-			name = name.replace('[]', '');
 
 			param['name'][i] = {};
 			param['name'][i][name] = jQuery(this).children('th.setting-element-title').children('div.subject').children('span.content').html();
 			param['attention'][name] = jQuery(this).children('th.setting-element-title').children('div.submessage').children('span.content').html();
 			param['type'][name] = jQuery(this).attr('title');
 			param['validation'][name] = validation;
+
 			//各属性値の取得
 			if ( jQuery(this).attr('title') == 'selectbox' ) {
 				param['attr']['value'][name] = [];
@@ -796,9 +802,8 @@ jQuery(document).ready(function() {
 				param['attr']['size'][name] = jQuery(this).find('.setting-element-discription > input').attr('size') ? jQuery(this).find('.setting-element-discription > input').attr('size') : '';
 				param['attr']['maxlength'][name] = jQuery(this).find('.setting-element-discription > input').attr('maxlength') ? jQuery(this).find-('.setting-element-discription > input').attr('maxlength') : '';
 				param['attr']['class'][name] = jQuery(this).find('.setting-element-discription > input').attr('class') ? jQuery(this).find('.setting-element-discription > input').attr('class') : '' ;
-
 			}
-			param['attr']['akismet'][name] = jQuery(this).find('.edit-element-container input[name=akismet-config]:checked').val();
+			param['attr']['akismet'][name] = jQuery(this).find('.edit-element-container input[name=akismet-config-'+name+']:checked').val();
 			param['form_front']['element'][name] = jQuery(this).children('td.setting-element-discription').html();
 		});
 		
@@ -840,6 +845,7 @@ jQuery(document).ready(function() {
 		if (jQuery('#require-mark-text').val() != '') {
 			param['config']['require'] = jQuery('#require-mark-content > span').html();
 		}
+		param['other_setting'] = jQuery('#trust-form-other-setting').val();
 
 		//コールバック
 		jQuery.post(ajaxurl, param, function(id) {
@@ -970,7 +976,8 @@ jQuery(document).ready(function() {
 			if (array_key_exists('form_admin', $_POST)) {update_post_meta( $post_id, 'form_admin_confirm', $_POST['form_admin']['confirm'] );}
 			if (array_key_exists('form_admin', $_POST)) {update_post_meta( $post_id, 'form_admin_finish', $_POST['form_admin']['finish'] );}
 			if (array_key_exists('form_front', $_POST)) {update_post_meta( $post_id, 'form_front', $_POST['form_front'] );}
-			if (array_key_exists('config', $_POST)) {update_post_meta( $post_id, 'config', $_POST['config'] );}	
+			if (array_key_exists('config', $_POST)) {update_post_meta( $post_id, 'config', $_POST['config'] );}
+			if (array_key_exists('other_setting', $_POST)) {update_post_meta( $post_id, 'other_setting', $_POST['other_setting'] );}
 		}
 		echo esc_html( $post_id );
 		die();
@@ -1009,8 +1016,10 @@ jQuery(document).ready(function() {
 		$atts = $this->_get_shortcode_atts('trust-form');
 		if ( defined( 'TRUST_FORM_DEFAULT_STYLE' ) && TRUST_FORM_DEFAULT_STYLE === false ) {
 			wp_enqueue_style('trust-form-front', "/wp-content/plugins/trust-form/css/front_{$atts['id']}.css");
-		} else {
+		} elseif ( defined( 'TRUST_FORM_DEFAULT_RESPONSIVE_STYLE' ) && TRUST_FORM_DEFAULT_RESPONSIVE_STYLE === false ) {
 			wp_enqueue_style('trust-form-front', plugins_url( "/css/default.css", __FILE__ ), array(). '1.0', 'all' );
+		} else {
+			wp_enqueue_style('trust-form-front', plugins_url( "/css/default-responsive.css", __FILE__ ), array(). '1.0', 'all' );
 		}
 	}
 
@@ -1066,7 +1075,7 @@ jQuery(document).ready(function() {
 }
 
 if ( !class_exists( 'WP_List_Table' ) ) {
-    require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
+    require_once( ABSPATH . '/wp-admin/includes/class-wp-list-table.php' );
 }
 class Trust_Form_Entries_List_Table extends WP_List_Table {
 
@@ -1385,7 +1394,7 @@ class Trust_Form_Entries_List_Table extends WP_List_Table {
 		/**
 		 * First, lets decide how many records per page to show
 		 */
-		$per_page = 5;
+		$per_page = 30;
 
 		/**
 		 * REQUIRED. Now we need to define our column headers. This includes a complete
@@ -1700,7 +1709,7 @@ class Trust_Form_Edit_List_Table extends WP_List_Table {
 		/**
 		 * First, lets decide how many records per page to show
 		 */
-		$per_page = 5;
+		$per_page = 30;
 
 		/**
 		 * REQUIRED. Now we need to define our column headers. This includes a complete
@@ -1861,6 +1870,8 @@ class Trust_Form_Front {
 	private $user_mail = '';
 	private $config = '';
 	private $err_msg = array();
+	private $wp_mail_from = '';
+	private $wp_mail_from_name = '';
 
 	public function __construct($id){
 		$this->id = $id;
@@ -1970,100 +1981,7 @@ class Trust_Form_Front {
 			return $response[1] == 'true' ? true : false;
 		}
 	}
-	/* ==================================================
-	 * Show input screen for display
-	 * @param	none
-	 * @return	String
-	 * @since	1.0
-	 */
-/*	public function show_input() {
-		$nonce = wp_nonce_field('trust_form','trust_form_input_nonce_field');
-		$html = <<<EOT
-<div id="trust-form" class="contact-form" >
-<p id="message-container-input">{$this->form[0]['input_top']}</p>
-<form action="#trust-form" method="post" >
-<table>
-<tbody>
-EOT;
-		foreach ( $this->name[0] as $key => $name ) {
-			$html .= '<tr><th scope="row"><div class="subject"><span class="content">'.$name.'</span>'.(isset($this->validate[0][$key]['required']) && $this->validate[0][$key]['required'] == 'true' ? '<span class="require">'.$this->config[0]['require'].'</span>' : '' ).'</div><div class="submessage">'.$this->attention[0][$key].'</div></th><td><div>'.$this->_get_element( $key ).'</div>';
 
-			if ( isset($this->err_msg[$key]) && is_array($this->err_msg[$key]) ) {
-				$html .= '<div class="error">';
-				foreach ( $this->err_msg[$key] as $msg ) {
-					$html .= $msg.'<br />';
-				}
-				$html .= '</div>';
-			}
-			$html .= '</td></tr>';
-		}
-		$html .= <<<EOT
-</tbody>
-</table>
-<input type="hidden" name="mode" value="confirm" />
-{$nonce}
-<p id="confirm-button" class="submit-container">{$this->form[0]['input_bottom']}</p>
-</form>
-</div>
-EOT;
-
-		return $html;
-	}
-*/
-	/* ==================================================
-	 * Show confirm screen for display
-	 * @param	none
-	 * @return	String
-	 * @since	1.0
-	 */
-/*	public function show_confirm() {
-		if ( empty($_POST) || !wp_verify_nonce($_POST['trust_form_input_nonce_field'],'trust_form') )
-			return $this->show_input();
-
-		$nonce = wp_nonce_field('trust_form','trust_form_confirm_nonce_field');
-		$html = <<<EOT
-<div id="trust-form" class="contact-form" >
-<p id="message-container-confirm">{$this->form[0]['confirm_top']}</p>
-<form action="#trust-form" method="post" >
-<table>
-<tbody>
-EOT;
-		foreach ( $this->name[0] as $key => $name ) {
-			$html .= '<tr><th><div class="subject">'.$name.'</div></th><td><div>'.$this->_get_input_data($key).'</div>';
-			
-			$html .= '</td></tr>';
-		}
-		$html .= <<<EOT
-</tbody>
-</table>
-<input type="hidden" name="mode" value="finish" />
-{$nonce}
-<p id="confirm-button" class="submit-container">{$this->form[0]['confirm_bottom']}</p>
-</form>
-</div>
-EOT;
-		return $html;
-	}
-*/
-	/* ==================================================
-	 * Show finish screen for display
-	 * @param	none
-	 * @return	String
-	 * @since	1.0
-	 */
-/*	public function show_finish() {
-		if ( empty($_POST) || !wp_verify_nonce($_POST['trust_form_confirm_nonce_field'],'trust_form') )
-			return $this->show_input();
-		
-		$this->_save();
-		$html = <<<EOT
-<div id="trust-form" class="contact-form" >
-<p id="message-container-confirm">{$this->form[0]['finish']}</p>
-</div>
-EOT;
-		return $html;
-	}
-*/
 	/* ==================================================
 	 * Get an input element
 	 * @param	none
@@ -2175,21 +2093,28 @@ EOT;
 					$new_responce['data'][$key] = rtrim($checkbox, ',');
 					break;
 				default:
-					$new_responce['data'][$key] = $_POST[$key];
+					if ( isset($_POST[$key]) ) {
+						$new_responce['data'][$key] = $_POST[$key];
+					}
 					break;
 			}
 			$new_responce['title'][$key] = $name;
+			
+			foreach ( $this->validate[0] as $validate ) {
+				if ( array_key_exists('e_mail_confirm', $validate) && in_array($name, $validate) ) {
+					unset($new_responce['title'][$key]);
+					unset($new_responce['data'][$key]);
+				}
+			}
 		}
+		
 		$new_responce['data']["date"] = date_i18n('Y/m/d H:i:s');
+		
 		$new_responce["status"] = 'new';
 		$new_responce["trash"] = 'false';
 		$new_responce["note"] = array();
-//		$responce[0][0] = '';
 		$new_responce = apply_filters( 'tr_new_responce', $new_responce, $this->type[0], $this->id );
-//		$responce[0][] = $new_responce;
-//		unset($responce[0][0]);
-		
-//		$responce[0] = apply_filters( 'tr_save_posts', $responce[0] );
+
 		$prev_responce = get_post_meta( $this->id, 'answer' );
 		foreach ( $prev_responce as $r ) {
 			if ( $r == $new_responce )
@@ -2202,30 +2127,60 @@ EOT;
 		if ( $this->user_mail[0]['user_mail_y'] === '1' ) {
 			foreach( $this->name[0] as $key => $name ) {
 				if (  $this->type[0][$key] =='e-mail' ) {
-					add_filter( 'wp_mail_from', array(&$this, 'wp_user_mail_from'));
-					add_filter( 'wp_mail_from_name',  array(&$this, 'wp_user_mail_from_name') );
+					add_filter( 'wp_mail_from', array(&$this, 'wp_user_mail_from'), 50 );
+					add_filter( 'wp_mail_from_name',  array(&$this, 'wp_user_mail_from_name'), 50 );
 					if ( isset($_POST[$key]) )
 						$this->_send_user_mail( $this->id, $new_responce, $_POST[$key] );
 				}
 			}
 		}
-		if ( has_filter( 'wp_mail_from', array(&$this, 'wp_user_mail_from') ) )
-			remove_filter( 'wp_mail_from', array(&$this, 'wp_user_mail_from') );
 
-		if ( has_filter( 'wp_mail_from_name', array(&$this, 'wp_user_mail_from_name') ) )
-			remove_filter( 'wp_mail_from_name', array(&$this, 'wp_user_mail_from_name') );
+		add_filter( 'wp_mail_from', array(&$this, 'wp_mail_from'), 100);
+		add_filter( 'wp_mail_from_name',  array(&$this, 'wp_mail_from_name'), 100 );
 
-		add_filter( 'wp_mail_from', array(&$this, 'wp_mail_from'));
-		add_filter( 'wp_mail_from_name',  array(&$this, 'wp_mail_from_name') );
+		if ( $this->_has_shortcode($this->admin_mail[0]['from']) ) {
+			$mail = str_replace( '[', '', $this->admin_mail[0]['from'] );
+			$mail = str_replace( ']', '', $mail );
+			foreach( $this->name[0] as $key => $name ) {
+				if ( $mail == $name ) {
+					if ( isset($_POST[$key]) ) {
+						$this->wp_mail_from = $_POST[$key];
+						add_filter( 'wp_mail_from', array(&$this, 'wp_mail_from_advanced'), 150 );
+					}
+				}
+			}
+		}
+		if ( $this->_has_shortcode($this->admin_mail[0]['from_name']) ) {
+			$mail = str_replace( '[', '', $this->admin_mail[0]['from_name'] );
+			$mail = str_replace( ']', '', $mail );
+			foreach( $this->name[0] as $key => $name ) {
+				if ( $mail == $name ) {
+					if ( isset($_POST[$key]) ) {
+						$this->wp_mail_from_name = $_POST[$key];
+						add_filter( 'wp_mail_from_name', array(&$this, 'wp_mail_from_name_advanced'), 150 );
+					}
+				}
+			}
+		}
 		$this->_send_admin_mail( $this->id, $new_responce );
 
-		if ( has_filter( 'wp_mail_from', array(&$this, 'wp_mail_from') ) )
-			remove_filter( 'wp_mail_from', array(&$this, 'wp_mail_from') );
-
-		if ( has_filter( 'wp_mail_from_name', array(&$this, 'wp_mail_from_name') ) )
-			remove_filter( 'wp_mail_from_name', array(&$this, 'wp_mail_from_name') );
 	}
-
+	
+	/* ==================================================
+	 * check shortcode 
+	 * @param	none
+	 * @return	void
+	 * @since	1.01
+	 */
+	private function _has_shortcode($shortcode) {
+		$pattern = '/\[.*\]/im';
+		if ( preg_match($pattern, $shortcode) ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	 
 	/* ==================================================
 	 * Send auto reply mail
 	 * @param	none
@@ -2239,7 +2194,9 @@ EOT;
 			if ( $key == 'date' ) {
 				$body .= __( 'Date', TRUST_FORM_DOMAIN ).': '.$res."\n\n";
 			} else {
-				$body .= $data['title'][$key].': '.$res."\n\n";
+				if ( isset($data['title'][$key]) ) {
+					$body .= $data['title'][$key].': '.$res."\n\n";
+				}
 			}
 		}
 		$body = str_replace( '[FORM DATA]', $body, $this->user_mail[0]['message2'] );
@@ -2247,10 +2204,25 @@ EOT;
 		foreach ( $data['data'] as $key => $res ) {
 			$body = str_replace( '['.$key.']', $res, $body );
 		}
-		
+
+		foreach ( $this->name[0] as $key => $name ) {
+			if ( preg_match('/['.$name.']/i', $body) ) {
+				if ( isset($data['data'][$key]) )
+					$body = str_replace( '['.$name.']', $data['data'][$key], $body );
+			}
+		}
+
+		$subject = $this->user_mail[0]['subject2'];
+		foreach ( $this->name[0] as $key => $name ) {
+			if ( preg_match('/['.$name.']/i', $subject) ) {
+				if ( isset($data['data'][$key]) )
+					$subject = str_replace( '['.$name.']', $data['data'][$key], $subject );
+			}
+		}
+		$subject = apply_filters( 'tr_pre_auto_reply_mail_subject', $subject, $data['data'], $id );
 		$body = apply_filters( 'tr_pre_auto_reply_mail_body', $body, $data['data'], $id );
 		
-		wp_mail( $to, $this->user_mail[0]['subject2'], $body );
+		wp_mail( $to, $subject, $body );
 	}
 
 	/* ==================================================
@@ -2263,23 +2235,34 @@ EOT;
 		$data['data'] = apply_filters( 'tr_pre_admin_mail', $data['data'], $id );
 		$body = '';
 		if ( !defined( 'TRUST_FORM_DB_SUPPORT' ) || TRUST_FORM_DB_SUPPORT !== false ) {
-			$body .= site_url( '/wp-admin/admin.php?page=trust-form-entries&form='.$id.'&status=new' );
+			$body .= admin_url( '/admin.php?page=trust-form-entries&form='.$id.'&status=new' );
 			$body .= "\n\n";
 		}
 		foreach ( $data['data'] as $key => $res ) {
 			if ( $key == 'date' ) {
 				$body .= apply_filters( 'tr_pre_date_admin_mail', __( 'Date', TRUST_FORM_DOMAIN ).': '.$res."\n\n", $id );
 			} else {
-				$body .= apply_filters( 'tr_pre_title_admin_mail', $data['title'][$key].': '.$res."\n\n", $id );
+				if ( isset($data['title'][$key]) ) {
+					$body .= apply_filters( 'tr_pre_title_admin_mail', $data['title'][$key].': '.$res."\n\n", $id );
+				}
 			}
 		}
 		$body = apply_filters( 'tr_pre_send_mail', $body, $data['data'], $id );
-		$subject = apply_filters( 'tr_subject_admin_mail', $this->admin_mail[0]['subject'], $data['data'], $id );
+
+		$subject = $this->admin_mail[0]['subject'];
+		foreach ( $this->name[0] as $key => $name ) {
+			if ( preg_match('/['.$name.']/i', $subject) ) {
+				if ( isset($data['data'][$key]) )
+					$subject = str_replace( '['.$name.']', $data['data'][$key], $subject );
+			}
+		}
+
+		$subject = apply_filters( 'tr_subject_admin_mail', $subject, $data['data'], $id );
 
 		$headers = '';
 		$headers .= $this->admin_mail[0]['cc'] != '' ? 'cc:' . $this->admin_mail[0]['cc'] . "\n" : '' ;
 		$headers .= $this->admin_mail[0]['bcc'] != '' ? 'bcc:' . $this->admin_mail[0]['bcc'] . "\n" : '' ;
-		wp_mail( $this->admin_mail[0]['to'], $subject, $body, $headers );
+		wp_mail( apply_filters( 'trust_form_admin_mail_to', $this->admin_mail[0]['to'], $id ) , $subject, $body, $headers );
 	}
 
 	public function wp_mail_from( $mail_from ) {
@@ -2287,7 +2270,15 @@ EOT;
 	}
 
 	public function wp_mail_from_name( $mail_from_name ) {
-		return wp_specialchars_decode($this->admin_mail[0]['from_name'], ENT_QUOTES);;
+		return wp_specialchars_decode($this->admin_mail[0]['from_name'], ENT_QUOTES);
+	}
+	
+	public function wp_mail_from_advanced( $mail_from ) {
+		return $this->wp_mail_from;
+	}
+
+	public function wp_mail_from_name_advanced( $mail_from_name ) {
+		return wp_specialchars_decode($this->wp_mail_from_name, ENT_QUOTES);
 	}
 
 	public function wp_user_mail_from( $mail_from ) {
@@ -2295,7 +2286,7 @@ EOT;
 	}
 
 	public function wp_user_mail_from_name( $mail_from_name ) {
-		return wp_specialchars_decode($this->user_mail[0]['from_name2'], ENT_QUOTES);;
+		return wp_specialchars_decode($this->user_mail[0]['from_name2'], ENT_QUOTES);
 	}
 
 	/* ==================================================
@@ -2314,35 +2305,41 @@ EOT;
 					if ( isset($this->validate[0][$key]['required']) && $this->validate[0][$key]['required'] == 'true' && !Trust_Form_Validator::required($_POST[$key]) )
 						$this->err_msg[$key][] = $Trust_Form_Validator_Message['required'];
 					//length
-					if ( isset($this->validate[0][$key]['min']) && is_numeric($this->validate[0][$key]['min']) 
-					&& isset($this->validate[0][$key]['max']) && is_numeric($this->validate[0][$key]['max'])  
-					&& (!Trust_Form_Validator::maxlength($_POST[$key], $this->validate[0][$key]['max']) 
-					|| !Trust_Form_Validator::minlength($_POST[$key], $this->validate[0][$key]['min']))) {
-						$tmp = str_replace( '__maxlength__', $this->validate[0][$key]['max'], $Trust_Form_Validator_Message['bothlength'] );
-						$tmp = str_replace( '__minlength__', $this->validate[0][$key]['min'], $tmp );
-						$this->err_msg[$key][] = $tmp;
-					} elseif ( isset($this->validate[0][$key]['min']) && is_numeric($this->validate[0][$key]['min']) && !Trust_Form_Validator::minlength($_POST[$key], $this->validate[0][$key]['min'])) {
-						$this->err_msg[$key][] = str_replace( '__minlength__', $this->validate[0][$key]['min'], $Trust_Form_Validator_Message['minlength'] );
-					} elseif ( isset($this->validate[0][$key]['max']) && is_numeric($this->validate[0][$key]['max']) && !Trust_Form_Validator::maxlength($_POST[$key], $this->validate[0][$key]['max'])) {
-						$this->err_msg[$key][] = str_replace( '__maxlength__', $this->validate[0][$key]['max'], $Trust_Form_Validator_Message['maxlength'] );
+					if ( isset($_POST[$key]) && $_POST[$key] != '' ) {
+						if ( isset($this->validate[0][$key]['min']) && is_numeric($this->validate[0][$key]['min']) 
+						&& isset($this->validate[0][$key]['max']) && is_numeric($this->validate[0][$key]['max'])  
+						&& (!Trust_Form_Validator::maxlength($_POST[$key], $this->validate[0][$key]['max']) 
+						|| !Trust_Form_Validator::minlength($_POST[$key], $this->validate[0][$key]['min']))) {
+							$tmp = str_replace( '__maxlength__', $this->validate[0][$key]['max'], $Trust_Form_Validator_Message['bothlength'] );
+							$tmp = str_replace( '__minlength__', $this->validate[0][$key]['min'], $tmp );
+							$this->err_msg[$key][] = $tmp;
+						} elseif ( isset($this->validate[0][$key]['min']) && is_numeric($this->validate[0][$key]['min']) && !Trust_Form_Validator::minlength($_POST[$key], $this->validate[0][$key]['min'])) {
+							$this->err_msg[$key][] = str_replace( '__minlength__', $this->validate[0][$key]['min'], $Trust_Form_Validator_Message['minlength'] );
+						} elseif ( isset($this->validate[0][$key]['max']) && is_numeric($this->validate[0][$key]['max']) && !Trust_Form_Validator::maxlength($_POST[$key], $this->validate[0][$key]['max'])) {
+							$this->err_msg[$key][] = str_replace( '__maxlength__', $this->validate[0][$key]['max'], $Trust_Form_Validator_Message['maxlength'] );
+						}
 					}
 					//charactors
-					if ( isset($this->validate[0][$key]['charactor']) && $this->validate[0][$key]['charactor'] == 'alphabet' && !Trust_Form_Validator::isAlpha($_POST[$key]) ){
-						$this->err_msg[$key][] = $Trust_Form_Validator_Message['eiji'];
-					} elseif ( isset($this->validate[0][$key]['charactor']) && $this->validate[0][$key]['charactor'] == 'numeric' && !Trust_Form_Validator::isNumber($_POST[$key]) ){
-						$this->err_msg[$key][] = $Trust_Form_Validator_Message['number'];
-					} elseif ( isset($this->validate[0][$key]['charactor']) && $this->validate[0][$key]['charactor'] == 'alphanumeric' && !Trust_Form_Validator::isHankaku($_POST[$key]) ){
-						$this->err_msg[$key][] = $Trust_Form_Validator_Message['hankaku'];
-					} elseif ( isset($this->validate[0][$key]['charactor']) && $this->validate[0][$key]['charactor'] == 'alphanumeric-and-code' && !Trust_Form_Validator::isHankaku2($_POST[$key]) ){
-						$this->err_msg[$key][] = $Trust_Form_Validator_Message['hankaku2'];
+					if ( isset($_POST[$key]) && $_POST[$key] != '' ) {
+						if ( isset($this->validate[0][$key]['charactor']) && $this->validate[0][$key]['charactor'] == 'alphabet' && !Trust_Form_Validator::isAlpha($_POST[$key]) ){
+							$this->err_msg[$key][] = $Trust_Form_Validator_Message['eiji'];
+						} elseif ( isset($this->validate[0][$key]['charactor']) && $this->validate[0][$key]['charactor'] == 'numeric' && !Trust_Form_Validator::isNumber($_POST[$key]) ){
+							$this->err_msg[$key][] = $Trust_Form_Validator_Message['number'];
+						} elseif ( isset($this->validate[0][$key]['charactor']) && $this->validate[0][$key]['charactor'] == 'alphanumeric' && !Trust_Form_Validator::isHankaku($_POST[$key]) ){
+							$this->err_msg[$key][] = $Trust_Form_Validator_Message['hankaku'];
+						} elseif ( isset($this->validate[0][$key]['charactor']) && $this->validate[0][$key]['charactor'] == 'alphanumeric-and-code' && !Trust_Form_Validator::isHankaku2($_POST[$key]) ){
+							$this->err_msg[$key][] = $Trust_Form_Validator_Message['hankaku2'];
+						}
 					}
 					//multibyte-charactors
-					if ( isset($this->validate[0][$key]['multi-charactor']) && $this->validate[0][$key]['multi-charactor'] == 'multibyte' && !Trust_Form_Validator::isZenkaku($_POST[$key]) ){
-						$this->err_msg[$key][] = $Trust_Form_Validator_Message['zenkaku'];
-					} elseif( isset($this->validate[0][$key]['multi-charactor']) && $this->validate[0][$key]['multi-charactor'] == 'katakana' && !Trust_Form_Validator::isKatakana($_POST[$key]) ){
-						$this->err_msg[$key][] = $Trust_Form_Validator_Message['katakana'];
-					} elseif( isset($this->validate[0][$key]['multi-charactor']) && $this->validate[0][$key]['multi-charactor'] == 'hiragana' && !Trust_Form_Validator::isHiragana($_POST[$key]) ){
-						$this->err_msg[$key][] = $Trust_Form_Validator_Message['hiragana'];
+					if ( isset($_POST[$key]) && $_POST[$key] != '' ) {
+						if ( isset($this->validate[0][$key]['multi-charactor']) && $this->validate[0][$key]['multi-charactor'] == 'multibyte' && !Trust_Form_Validator::isZenkaku($_POST[$key]) ){
+							$this->err_msg[$key][] = $Trust_Form_Validator_Message['zenkaku'];
+						} elseif( isset($this->validate[0][$key]['multi-charactor']) && $this->validate[0][$key]['multi-charactor'] == 'katakana' && !Trust_Form_Validator::isKatakana($_POST[$key]) ){
+							$this->err_msg[$key][] = $Trust_Form_Validator_Message['katakana'];
+						} elseif( isset($this->validate[0][$key]['multi-charactor']) && $this->validate[0][$key]['multi-charactor'] == 'hiragana' && !Trust_Form_Validator::isHiragana($_POST[$key]) ){
+							$this->err_msg[$key][] = $Trust_Form_Validator_Message['hiragana'];
+						}
 					}
 					break;
 				case 'radio':
@@ -2385,6 +2382,15 @@ EOT;
 						$this->err_msg[$key][] = $Trust_Form_Validator_Message['required'];
 					if ( $_POST[$key] != "" && !is_email($_POST[$key]) )
 						$this->err_msg[$key][] = $Trust_Form_Validator_Message['e-mail'];
+					if ( isset( $_POST['send-to-confirm'] ) && isset($this->validate[0][$key]['e_mail_confirm']) && $this->validate[0][$key]['e_mail_confirm'] != '' ) {
+						foreach ( $this->name[0] as $key_1 => $name_1 ) {
+							if ( $this->validate[0][$key]['e_mail_confirm'] == $name_1 ) {
+								if ( $_POST[$key] != $_POST[$key_1] )
+									$this->err_msg[$key][] = $Trust_Form_Validator_Message['e_mail_confirm'];
+							}
+						}
+					}
+						
 			}
 		}
 		if ( empty($this->err_msg) ) {
@@ -2614,6 +2620,7 @@ $Trust_Form_Validator_Message = array(
 	'hankaku'    => __("Please enter by using English or number", TRUST_FORM_DOMAIN),
 	'hankaku2'   => __("Please enter by using English or number or code", TRUST_FORM_DOMAIN),
 	'e-mail'     => __("The format of the e-mail address is invalid", TRUST_FORM_DOMAIN),
+	'e_mail_confirm' => __("The e-mail mismatch", TRUST_FORM_DOMAIN)
 //	const REQUIRED_SELECT  = 'が選択されていません';
 //	const MAXLENGTH        = 'は__maxlength__文字以下で入力してください';
 //	const MINLENGTH        = 'は__minlength__文字以上で入力してください';
@@ -2633,4 +2640,86 @@ $Trust_Form_Validator_Message = array(
 //	const SIGNUMBER        = 'は半角数字または半角記号で入力してください';
 //	const HANKAKU2         = 'は半角英数字または半角記号で入力してください';
 );
+
+add_action( 'the_content', 'trust_form_change_validate_message' );
+function trust_form_change_validate_message( $content ) {
+	global $Trust_Form_Validator_Message;
+	$Trust_Form_Validator_Message['required'] = apply_filters( 'tr_validate_message_required', $Trust_Form_Validator_Message['required'] );
+	$Trust_Form_Validator_Message['e-mail'] = apply_filters( 'tr_validate_message_mail', $Trust_Form_Validator_Message['e-mail'] );
+	$Trust_Form_Validator_Message['hiragana'] = apply_filters( 'tr_validate_message_hiragana', $Trust_Form_Validator_Message['hiragana'] );
+	$Trust_Form_Validator_Message['minlength'] = apply_filters( 'tr_validate_message_minlength', $Trust_Form_Validator_Message['minlength'] );
+	$Trust_Form_Validator_Message['maxlength'] = apply_filters( 'tr_validate_message_maxlength', $Trust_Form_Validator_Message['maxlength'] );
+	$Trust_Form_Validator_Message['bothlength'] = apply_filters( 'tr_validate_message_bothlength', $Trust_Form_Validator_Message['bothlength'] );
+	$Trust_Form_Validator_Message['zenkaku'] = apply_filters( 'tr_validate_message_zenkaku', $Trust_Form_Validator_Message['zenkaku'] );
+	$Trust_Form_Validator_Message['eiji'] = apply_filters( 'tr_validate_message_eiji', $Trust_Form_Validator_Message['eiji'] );
+	$Trust_Form_Validator_Message['number'] = apply_filters( 'tr_validate_message_number', $Trust_Form_Validator_Message['number'] );
+	$Trust_Form_Validator_Message['katakana'] = apply_filters( 'tr_validate_message_katakana', $Trust_Form_Validator_Message['katakana'] );
+	$Trust_Form_Validator_Message['hankaku'] = apply_filters( 'tr_validate_message_hankaku', $Trust_Form_Validator_Message['hankaku'] );
+	$Trust_Form_Validator_Message['hankaku2'] = apply_filters( 'tr_validate_message_hankaku2', $Trust_Form_Validator_Message['hankaku2'] );
+	$Trust_Form_Validator_Message['e_mail_confirm'] = apply_filters( 'tr_validate_message_e_mail_confirm', $Trust_Form_Validator_Message['e_mail_confirm'] );
+	
+	return $content;
+}
+
+class Trust_Form_Other_Setting {
+
+	public function __construct() {
+		add_filter( 'tr_new_responce', array( $this, 'add_responce' ), 20, 3 );
+		add_action( 'tr_entry_action', array( $this, 'entry_action' ), 20, 3 );
+		add_filter( 'tr_pre_send_mail', array( $this, 'admin_mail' ), 20, 3 );
+	}
+
+	private function _unserialized($data) {
+		if ( $data == '' )
+			return false;
+
+		$data = explode("\n", $data);
+		$data = array_map('trim', $data);
+		$data = array_filter($data, 'strlen');
+		$data = array_values($data);
+	
+		return $data;
+	}
+	
+	public function admin_mail( $body, $data, $id ) {
+		$other_setting = $this->_unserialized(get_post_meta( $id, 'other_setting', true ));
+		
+		if ( is_array($other_setting) ) {
+			foreach ( $other_setting as $setting ) {
+				$setting = explode(':', $setting);
+				if ( $setting[0] == 'server' && isset($data[$setting[1]]) ) {
+					$body .= $setting[1] .': '. $data[$setting[1]] . "\n\n";
+				}
+			}
+		}
+		
+		return $body;
+	}
+	
+	public function add_responce($res, $type, $id) {
+		$other_setting = $this->_unserialized(get_post_meta( $id, 'other_setting', true ));
+		
+		if ( is_array($other_setting) ) {
+			foreach ( $other_setting as $setting ) {
+				$setting = explode(':', $setting);
+				if ( $setting[0] == 'server' )
+					$res['data'][$setting[1]] = $_SERVER[$setting[1]];
+			}
+		}
+			
+		return $res;
+	}
+	
+	public function entry_action( $entry, $form_id, $entry_id ) {
+		$other_setting = $this->_unserialized(get_post_meta( $form_id, 'other_setting', true ));
+		if ( is_array($other_setting) ) {
+			foreach ( $other_setting as $setting ) {
+				$setting = explode(':', $setting);
+				if ( $setting[0] == 'server' && array_key_exists( $setting[1], $entry['data'] ) )
+					echo '<tr><th scope="row">' . esc_html($setting[1]) . '</th><td>' . $entry['data'][$setting[1]] . '</td></tr>';
+			}
+		}
+	}
+}
+new Trust_Form_Other_Setting();
 ?>
