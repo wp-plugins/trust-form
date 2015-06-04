@@ -157,7 +157,7 @@ msgid "Form Title"
 msgstr ""
 
 #: line 15
-msgid "Standard Field"
+msgid "Form Element"
 msgstr ""
 
 #: line 16
@@ -423,6 +423,10 @@ msgid "Item moved to the Read."
 msgid_plural "%s items moved to the Read."
 msgstr[0] ""
 
+#: line 42
+msgid "CSV for Microsoft Excel."
+msgstr ""
+
 msgid "CSV Download"
 msgstr ""
 
@@ -477,3 +481,24 @@ msgstr ""
 msgid "Re-entering E-mail"
 msgstr ""
 
+# added by natasha
+msgid "Please Input Text above the Form"
+msgstr ""
+
+msgid "Please Input Thanks Message"
+msgstr ""
+
+msgid "Require Mark Setting"
+msgstr ""
+
+msgid "Change Saved"
+msgstr ""
+
+msgid "Click Elements to Setting."
+msgstr ""
+
+msgid "option value"
+msgstr ""
+
+msgid "Set two elements of mail address, and input the another title below each other."
+msgstr ""

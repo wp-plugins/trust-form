@@ -2,8 +2,8 @@
 Contributors: horike
 Tags:  form, contact form, contact
 Requires at least: 3.3
-Tested up to: 3.7.1
-Stable tag: 1.8.5
+Tested up to: 3.8.3
+Stable tag: 1.8.8
 
 Trust Form is a contact form with confirmation screen and mail and data base support.
 
@@ -31,6 +31,8 @@ Please contact to me.
 * [Seguchi Rie](http://5dg.biz) making the admin screen icon
 * webnist Bug fixes
 * [Aihara Chieko](http://webourgeon.com/) making the default css
+* [natasha](http://natasha.jp/) making admin UI 
+* [Caxias Hosoya](https://wordpress.org/plugins/caxias-hosoya/) fixed bug
 
 == Installation ==
 
@@ -98,8 +100,12 @@ Please contact to me.
 = 1.8.1 =
 * Fixd a bug that warning error on finish screen.
 = 1.8.3 =
-* Add filter
-= 1.8.4 =
-* Add class Trust_Form_API
-= 1.8.5 =
+* Add filter.
+= 1.8.6 =
+* Add Custom hooks.
+= 1.8.7 =
+* Delete CSV directory.
+= 1.8.8 =
 * some fix
+= 2.0 =
+* Update admin UI by making [natasha](http://natasha.jp/)

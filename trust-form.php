@@ -1,14 +1,13 @@
 <?php 
 /*
 Plugin Name: Trust Form
-Plugin URI: http://www.kakunin-pl.us/
+Plugin URI: https://github.com/horike37/Trust-Form
 Description: Trust Form is a contact form with confirmation screen and mail and data base support.
 Author: horike takahiro
-Version: 1.8.5
-Author URI: http://www.kakunin-pl.us/
+Version: 2.0
+Author URI: https://github.com/horike37/Trust-Form
 
-
-Copyright 2012 horike takahiro (email : horike37@gmail.com)
+Copyright 2015 horike takahiro (email : horike37@gmail.com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -30,14 +29,11 @@ if ( ! defined( 'TRUST_FORM_DOMAIN' ) )
 	
 if ( ! defined( 'TRUST_FORM_PLUGIN_URL' ) )
 	define( 'TRUST_FORM_PLUGIN_URL', plugins_url() . '/' . dirname( plugin_basename( __FILE__ ) ));
-
-if ( ! defined( 'TRUST_FORM_PLUGIN_DIR' ) )
-	define( 'TRUST_FORM_PLUGIN_DIR', WP_PLUGIN_DIR . '/' . dirname( plugin_basename( __FILE__ ) ));
 	
 new Trust_Form();
 
 class Trust_Form {
-	private $version = '1.8.4';
+	private $version = '2.0';
 	private $edit_page;
 	private $entries_page;
 	private $base_dir;
@@ -282,39 +278,26 @@ class Trust_Form {
 				}
 			}
 
+			$mime_type = 'text/csv;charset=UTF-8';
 			if ( defined( 'TRUST_FORM_CSV_SJIS_SUPPORT' ) 
 			&& TRUST_FORM_CSV_SJIS_SUPPORT === true 
 			&& function_exists('mb_convert_variables') ) {
-				mb_convert_variables('SJIS', 'UTF-8', $csv_ti);
-				mb_convert_variables('SJIS', 'UTF-8', $csv);
+				mb_convert_variables('sjis-win', 'UTF-8', $csv_ti);
+				mb_convert_variables('sjis-win', 'UTF-8', $csv);
+				$mime_type = 'text/csv;charset=Shift_JIS';
 			}
 
 			$file_name = 'result_'.time().'.csv';
-			$full_file_name = $this->plugin_dir . '/csv/' . $file_name;
-
-			$fp = fopen( $full_file_name, 'w' );
 
 			$csv = array_reverse($csv);
-			fputcsv( $fp, $csv_ti[0] );
+			header('Content-Disposition: inline; filename="'.$file_name.'"');
+			header('Content-Type: '.$mime_type);
+			
+			$csv_format = isset( $_REQUEST['suite-excel'] ) && $_REQUEST['suite-excel'] ? 'excel' : 'standard';
+			echo $this->create_csv_row( $csv_ti[0], $csv_format );
 			foreach ($csv as $data) {
-				fputcsv($fp, $data);
+				echo $this->create_csv_row( $data, $csv_format );
 			}
-			fclose($fp);
-
-			$file_size = @filesize($full_file_name);
-			ini_set('zlib.output_compression','Off');
-			header("Pragma: public");
-			header("Expires: 0");
-			header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-			header("Cache-Control: public");
-			header("Content-Description: File Transfer");
-			header("Content-Type: application/octet-stream ");
-			header("Content-Disposition: attachment; filename=".$file_name);
-			header("Content-Transfer-Encoding: binary");
-			header("Content-size: binary");
-			header("Content-Length: ".$file_size);
-			@readfile($full_file_name);
-			@unlink($full_file_name);
 			exit;
 		}
 		
@@ -458,12 +441,14 @@ class Trust_Form {
 	 * @since	1.0
 	 */
 	public function admin_menu() {
-		add_menu_page( __( 'Trust Form', TRUST_FORM_DOMAIN ), __( 'Trust Form', TRUST_FORM_DOMAIN ), 'edit_posts', $this->edit_page, array( &$this,'add_admin_edit_page' ), TRUST_FORM_PLUGIN_URL . '/images/menu-icon.png' );
-		add_submenu_page( $this->edit_page, __( 'Edit Forms', TRUST_FORM_DOMAIN ), __( 'Edit Forms', TRUST_FORM_DOMAIN ), 'edit_posts', $this->edit_page, array( &$this, 'add_admin_edit_page' ) );
-		add_submenu_page( $this->edit_page, __( 'Add Form', TRUST_FORM_DOMAIN ), __( 'Add Form', TRUST_FORM_DOMAIN ), 'edit_posts', $this->add_page, array( &$this, 'add_admin_add_page' ) );
+		$cap = apply_filters( 'trust_form_admin_menu_cap', 'edit_posts' );
+
+		add_menu_page( __( 'Trust Form', TRUST_FORM_DOMAIN ), __( 'Trust Form', TRUST_FORM_DOMAIN ), $cap, $this->edit_page, array( &$this,'add_admin_edit_page' ), TRUST_FORM_PLUGIN_URL . '/images/menu-icon.png' );
+		add_submenu_page( $this->edit_page, __( 'Edit Forms', TRUST_FORM_DOMAIN ), __( 'Edit Forms', TRUST_FORM_DOMAIN ), $cap, $this->edit_page, array( &$this, 'add_admin_edit_page' ) );
+		add_submenu_page( $this->edit_page, __( 'Add Form', TRUST_FORM_DOMAIN ), __( 'Add Form', TRUST_FORM_DOMAIN ), $cap, $this->add_page, array( &$this, 'add_admin_add_page' ) );
 
 		if ( !defined( 'TRUST_FORM_DB_SUPPORT' ) || TRUST_FORM_DB_SUPPORT !== false )
-			add_submenu_page( $this->edit_page, __( 'Entries', TRUST_FORM_DOMAIN ), __( 'Entries', TRUST_FORM_DOMAIN ), 'edit_posts', $this->entries_page, array( &$this, 'add_admin_entries_page' ) );
+			add_submenu_page( $this->edit_page, __( 'Entries', TRUST_FORM_DOMAIN ), __( 'Entries', TRUST_FORM_DOMAIN ), $cap, $this->entries_page, array( &$this, 'add_admin_entries_page' ) );
 	}
 
 	/* ==================================================
@@ -804,12 +789,14 @@ jQuery(document).ready(function() {
 				}
 				jQuery.post(ajaxurl, param3, function() {});
 
+			//changed by natasha
 			var btn = jQuery('#save-change');
-				btn.css('display', 'none');
+				//btn.css('display', 'none');
 				btn.after(jQuery('<img>', {id:'loading-icon',src:'../wp-content/plugins/trust-form/images/ajax-loader.gif',style:'margin-left:30px;'}));
 				setTimeout( function(id) {
    					jQuery('#loading-icon').remove();
    					btn.css('display', 'block');
+   					btn.after('<p id="save-result">' + '<?php echo __( 'Change Saved', TRUST_FORM_DOMAIN ); ?>' + '</p>');//add
    					jQuery('#trust-form-short-code').css('display', 'block');
    					jQuery('#trust-form-short-code-under').css('display', 'block');
 					jQuery('#trust-form-short-code > p > input').val('[trust-form id='+jQuery('#form_id').val()+']');
@@ -959,7 +946,7 @@ jQuery(document).ready(function() {
 		if ( defined( 'TRUST_FORM_DEFAULT_STYLE' ) && TRUST_FORM_DEFAULT_STYLE === false ) {
 			wp_enqueue_style('trust-form-front', "/wp-content/plugins/trust-form/css/front_{$atts['id']}.css");
 		} elseif ( defined( 'TRUST_FORM_DEFAULT_RESPONSIVE_STYLE' ) && TRUST_FORM_DEFAULT_RESPONSIVE_STYLE === false ) {
-			wp_enqueue_style('trust-form-front', plugins_url( "/css/default.css", __FILE__ ), array(). '1.0', 'all' );
+			wp_enqueue_style('trust-form-front', plugins_url( "/css/default.css", __FILE__ ), array(), '1.0', 'all' );
 		} else {
 			wp_enqueue_style('trust-form-front', plugins_url( "/css/default-responsive.css", __FILE__ ), array(), '1.0', 'all' );
 		}
@@ -1014,6 +1001,30 @@ jQuery(document).ready(function() {
 		return $found;
 	}
 
+	/* ==================================================
+	 * generating csv row data from array data
+	 * @param	$row_datas Array, $mode String
+	 * @return	String
+	 * @since	1.8.8
+	 */
+	private function create_csv_row( $row_datas, $mode = 'standard' ) {
+		if ( ! is_array( $row_datas ) ) { return $row_datas; }
+		foreach ( $row_datas as $key => $row_data ) {
+			if ( 'excel' == $mode ) {
+				if ( preg_match( '|^[\+\-\/0-9]+$|', $row_data ) || preg_match( '|^[\+\-\－\/０-９]+$|', $row_data ) ) {
+					$row_data = '=' . '"' . $row_data . '"';
+				}
+				if ( preg_match( '|^[0-9]+$|', $row_data ) || preg_match( '|^[０-９]+$|', $row_data ) ) {
+					$row_data = '=' . '"' . $row_data . '"';
+				}
+			}
+			if ( preg_match( '/[",\'\r\n]/', $row_data ) ) {
+				$row_datas[$key]= '"' . preg_replace( '/"/', '""', $row_data ) . '"';
+			}
+		}
+	
+		return implode( ',', $row_datas ) . "\n";
+	}
 }
 
 if ( !class_exists( 'WP_List_Table' ) ) {
@@ -1780,7 +1791,7 @@ function trust_form_shortcode($atts) {
 	} elseif (file_exists(get_stylesheet_directory(). '/trust-form-tpl-.php')) {
 		require_once(get_stylesheet_directory(). '/trust-form-tpl-.php');
 	} else {
-		require_once(TRUST_FORM_PLUGIN_DIR. '/trust-form-tpl-.php');
+		require_once(dirname(  __FILE__ ). '/trust-form-tpl-.php');
 	}
 
 	if ( ( isset( $_POST['send-to-confirm'] ) || isset( $_POST['send-to-confirm_x'] ) || ( isset($_POST['mode']) && $_POST['mode'] == 'confirm' ) ) && $trust_form->validate() ) {
@@ -2166,6 +2177,7 @@ class Trust_Form_Front {
 		$body = apply_filters( 'tr_pre_auto_reply_mail_body', $body, $data['data'], $id );
 		
 		wp_mail( $to, $subject, $body );
+		do_action( 'trust_form_sent_auto_reply_mail', $data, $id, $to );
 	}
 
 	/* ==================================================
@@ -2206,6 +2218,7 @@ class Trust_Form_Front {
 		$headers .= $this->admin_mail[0]['cc'] != '' ? 'cc:' . $this->admin_mail[0]['cc'] . "\n" : '' ;
 		$headers .= $this->admin_mail[0]['bcc'] != '' ? 'bcc:' . $this->admin_mail[0]['bcc'] . "\n" : '' ;
 		wp_mail( apply_filters( 'trust_form_admin_mail_to', $this->admin_mail[0]['to'], $id ) , $subject, $body, $headers );
+		do_action( 'trust_form_sent_admin_mail', $data, $id );
 	}
 
 	public function wp_mail_from( $mail_from ) {
@@ -2336,6 +2349,9 @@ class Trust_Form_Front {
 						
 			}
 		}
+
+		$this->err_msg = apply_filters( 'trust_form_validate_error_messages', $this->err_msg, $this->id );
+
 		if ( empty($this->err_msg) ) {
 			return true;
 		} else {
