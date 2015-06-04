@@ -1,14 +1,13 @@
 <?php 
 /*
 Plugin Name: Trust Form
-Plugin URI: http://www.kakunin-pl.us/
+Plugin URI: https://github.com/horike37/Trust-Form
 Description: Trust Form is a contact form with confirmation screen and mail and data base support.
 Author: horike takahiro
-Version: 1.8.8
-Author URI: http://www.kakunin-pl.us/
+Version: 2.0
+Author URI: https://github.com/horike37/Trust-Form
 
-
-Copyright 2012 horike takahiro (email : horike37@gmail.com)
+Copyright 2015 horike takahiro (email : horike37@gmail.com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -30,14 +29,11 @@ if ( ! defined( 'TRUST_FORM_DOMAIN' ) )
 	
 if ( ! defined( 'TRUST_FORM_PLUGIN_URL' ) )
 	define( 'TRUST_FORM_PLUGIN_URL', plugins_url() . '/' . dirname( plugin_basename( __FILE__ ) ));
-
-if ( ! defined( 'TRUST_FORM_PLUGIN_DIR' ) )
-	define( 'TRUST_FORM_PLUGIN_DIR', WP_PLUGIN_DIR . '/' . dirname( plugin_basename( __FILE__ ) ));
 	
 new Trust_Form();
 
 class Trust_Form {
-	private $version = '1.8.8';
+	private $version = '2.0';
 	private $edit_page;
 	private $entries_page;
 	private $base_dir;
@@ -793,12 +789,14 @@ jQuery(document).ready(function() {
 				}
 				jQuery.post(ajaxurl, param3, function() {});
 
+			//changed by natasha
 			var btn = jQuery('#save-change');
-				btn.css('display', 'none');
+				//btn.css('display', 'none');
 				btn.after(jQuery('<img>', {id:'loading-icon',src:'../wp-content/plugins/trust-form/images/ajax-loader.gif',style:'margin-left:30px;'}));
 				setTimeout( function(id) {
    					jQuery('#loading-icon').remove();
    					btn.css('display', 'block');
+   					btn.after('<p id="save-result">' + '<?php echo __( 'Change Saved', TRUST_FORM_DOMAIN ); ?>' + '</p>');//add
    					jQuery('#trust-form-short-code').css('display', 'block');
    					jQuery('#trust-form-short-code-under').css('display', 'block');
 					jQuery('#trust-form-short-code > p > input').val('[trust-form id='+jQuery('#form_id').val()+']');
@@ -948,9 +946,9 @@ jQuery(document).ready(function() {
 		if ( defined( 'TRUST_FORM_DEFAULT_STYLE' ) && TRUST_FORM_DEFAULT_STYLE === false ) {
 			wp_enqueue_style('trust-form-front', "/wp-content/plugins/trust-form/css/front_{$atts['id']}.css");
 		} elseif ( defined( 'TRUST_FORM_DEFAULT_RESPONSIVE_STYLE' ) && TRUST_FORM_DEFAULT_RESPONSIVE_STYLE === false ) {
-			wp_enqueue_style('trust-form-front', plugins_url( "/css/default.css", __FILE__ ), array(). '1.0', 'all' );
+			wp_enqueue_style('trust-form-front', plugins_url( "/css/default.css", __FILE__ ), array(), '1.0', 'all' );
 		} else {
-			wp_enqueue_style('trust-form-front', plugins_url( "/css/default-responsive.css", __FILE__ ), array(). '1.0', 'all' );
+			wp_enqueue_style('trust-form-front', plugins_url( "/css/default-responsive.css", __FILE__ ), array(), '1.0', 'all' );
 		}
 	}
 
@@ -1793,7 +1791,7 @@ function trust_form_shortcode($atts) {
 	} elseif (file_exists(get_stylesheet_directory(). '/trust-form-tpl-.php')) {
 		require_once(get_stylesheet_directory(). '/trust-form-tpl-.php');
 	} else {
-		require_once(TRUST_FORM_PLUGIN_DIR. '/trust-form-tpl-.php');
+		require_once(dirname(  __FILE__ ). '/trust-form-tpl-.php');
 	}
 
 	if ( ( isset( $_POST['send-to-confirm'] ) || isset( $_POST['send-to-confirm_x'] ) || ( isset($_POST['mode']) && $_POST['mode'] == 'confirm' ) ) && $trust_form->validate() ) {
